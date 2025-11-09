@@ -16,23 +16,27 @@ const string version = "0.0.0";
 bool repl_iter(istream& in, ostream& out, OrobaObject* active, LocalCollector& collector) {
     cout << "> ";
 
-    variant<Bytecode, OrobaError> parsed = parse(in, collector);
+    variant<Bytecode, ParseError> parsed = parse(in, collector);
     if (holds_alternative<Bytecode>(parsed)) {
         Bytecode code = get<Bytecode>(parsed);
-        OrobaObject* result = eval(code, active, collector); 
-        OrobaObject* result_tostr = result->SendExternalMessage("to-string", vector<OrobaObject*>(), collector);
-        StringObject* str = dynamic_cast<StringObject*>(result_tostr);
-
-        if (str) {
-            out << str->data;
-        } else {
-            out << "object to-string method did not return a string!";
+        try {
+            OrobaObject* result = eval(code, active, collector); 
+            OrobaObject* result_tostr = result->SendMessage(false, "to-string", vector<OrobaObject*>(), collector);
+            StringObject* str = dynamic_cast<StringObject*>(result_tostr);
+            if (str) {
+                out << str->data;
+            } else {
+                out << "object to-string method did not return a string!";
+            }
+        } catch (OrobaError err) {
+            out << err.message;
         }
+
         out << "\n";
         out.flush();
         return true;
     } else {
-        out << get<OrobaError>(parsed);
+        out << get<ParseError>(parsed);
         out << "\n";
         out.flush();
         return false;
@@ -49,8 +53,8 @@ int main (int argc, char** argv) {
     main_collector.Add(world);
     try {
         while (repl_iter(cin, cout, world, main_collector));
-    } catch (std::string& err) {
-        cout << "Threw error indication exceptional circumstance:\n" << err << "\n";
+    } catch (InternalError& err) {
+        cout << "Threw error indication exceptional circumstance:\n" << err.message << "\n";
         cout.flush();
     }
     return 0;

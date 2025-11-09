@@ -8,6 +8,6 @@
 #include "oroba/data/bytecode.hpp"
 #include "oroba/data/error.hpp"
 
-std::variant<Bytecode, OrobaError> parse(std::istream& in, LocalCollector& collector);
+std::variant<Bytecode, ParseError> parse(std::istream& in, LocalCollector& collector);
 
 #endif

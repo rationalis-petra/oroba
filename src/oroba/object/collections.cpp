@@ -6,19 +6,13 @@ using namespace std;
 
 StringObject::StringObject(string source) : data(source) { }
 
-static OrobaObject* MessageResponse(StringObject* obj, string name, vector<OrobaObject*> args, LocalCollector& collector) {
+OrobaObject* StringObject::SendMessage(bool internal, string name, vector<OrobaObject*> args, LocalCollector& collector) {
     if (name == "to-string" && args.size() == 0) {
-        return obj;
+        return this;
     }
-    else 
-        return obj->MessageNotFound(name, args, collector);
-}
-
-OrobaObject* StringObject::SendExternalMessage(string name, vector<OrobaObject*> args, LocalCollector& collector) {
-    return MessageResponse(this, name, args, collector);
+    else {
+        return MessageNotFound(name, args, collector);
+    }
 }
 
 
-OrobaObject* StringObject::SendInternalMessage(string name, vector<OrobaObject*> args, LocalCollector& collector) {
-    return MessageResponse(this, name, args, collector);
-}

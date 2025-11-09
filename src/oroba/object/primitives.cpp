@@ -6,7 +6,7 @@
 
 using namespace std;
 
-OrobaObject* PrimitiveObject::SendExternalMessage(string name, vector<OrobaObject*> args, LocalCollector& collector) {
+OrobaObject* PrimitiveObject::SendMessage(bool internal, string name, vector<OrobaObject*> args, LocalCollector& collector) {
     if (name == "to-string" && args.size() == 0) {
         OrobaObject* stringobj = new StringObject(ToString());
         collector.Add(stringobj);
@@ -14,14 +14,6 @@ OrobaObject* PrimitiveObject::SendExternalMessage(string name, vector<OrobaObjec
     } else 
         return MessageNotFound(name, args, collector);
 }
-
-OrobaObject* PrimitiveObject::SendInternalMessage(string name, vector<OrobaObject*> args, LocalCollector& collector) {
-    if (name == "to-string" && args.size() == 0)
-        return this;
-    else 
-        return MessageNotFound(name, args, collector);
-}
-
 
 BooleanObject::BooleanObject(bool source) : val(source) {
 }

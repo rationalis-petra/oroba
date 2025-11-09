@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "oroba/data/error.hpp"
+
 using namespace std;
 
 OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) {
@@ -24,7 +26,7 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             MessageOp message = get<MessageOp>(op.payload);
             vector args(stack.end() - message.num_operands, stack.end());
             stack.resize(stack.size() - message.num_operands);
-            OrobaObject* result = activation_objects.back()->SendInternalMessage(message.name, args, collector);
+            OrobaObject* result = activation_objects.back()->SendMessage(true, message.name, args, collector);
             stack.push_back(result);
             break;
         }
@@ -34,7 +36,7 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             stack.resize(stack.size() - message.num_operands);
             OrobaObject* target = stack.back();
             stack.pop_back();
-            OrobaObject* result = target->SendExternalMessage(message.name, args, collector);
+            OrobaObject* result = target->SendMessage(false, message.name, args, collector);
             stack.push_back(result);
             break;
         }
@@ -66,5 +68,9 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
         }
     }
 
-    return stack.back();
+    if (!stack.empty()) {
+        return stack.back();
+    } else {
+        throw InternalError("Value stack not empty when returning!");
+    }
 }

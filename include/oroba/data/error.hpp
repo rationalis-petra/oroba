@@ -4,14 +4,26 @@
 #include <ostream>
 #include <string>
 
+class OrobaObject;
+
 typedef unsigned long inputpos;
 
-struct OrobaError {
+struct ParseError {
     std::string message;
     inputpos start;
     inputpos end;
 };
 
-std::ostream& operator<<(std::ostream& out, OrobaError error);
+struct InternalError {
+    InternalError(std::string message);
+    std::string message;
+};
+
+struct OrobaError {
+    OrobaError(std::string message);
+    std::string message;
+};
+
+std::ostream& operator<<(std::ostream& out, ParseError error);
 
 #endif

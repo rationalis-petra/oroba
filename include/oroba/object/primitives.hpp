@@ -8,8 +8,7 @@
 
 class PrimitiveObject : public OrobaObject {
 public:
-    virtual OrobaObject* SendExternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
-    virtual OrobaObject* SendInternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
+    virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
 
     virtual std::string ToString() = 0;
 };

@@ -15,8 +15,7 @@
 
 class OrobaObject : public Collectable, public Tracer {
 public:
-    virtual OrobaObject* SendExternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
-    virtual OrobaObject* SendInternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
+    virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
 
     OrobaObject* MessageNotFound(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector);
 

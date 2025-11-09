@@ -8,25 +8,25 @@
 
 using namespace std;
 
-optional<OrobaError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector);
-optional<OrobaError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector);
-optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& collector);
-optional<OrobaError> parse_string(istream& in, Bytecode& out, LocalCollector& collector);
-optional<OrobaError> error(string message);
+optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector);
+optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector);
+optional<ParseError> parse_number(istream& in, Bytecode& out, LocalCollector& collector);
+optional<ParseError> parse_string(istream& in, Bytecode& out, LocalCollector& collector);
+optional<ParseError> error(string message);
 void consume_whitespace(istream& in);
 bool is_whitespace(int c);
 bool is_specialchar(int c);
 
-variant<Bytecode, OrobaError> parse(istream& in, LocalCollector& collector) {
+variant<Bytecode, ParseError> parse(istream& in, LocalCollector& collector) {
     Bytecode bytecode;
-    optional<OrobaError> out = parse_expr(in, bytecode, collector);
+    optional<ParseError> out = parse_expr(in, bytecode, collector);
     if (out.has_value())
         return out.value();
     else
         return bytecode;
 }
     
-optional<OrobaError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector) {
+optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector) {
     bool has_target = false;
     while (true) {
         consume_whitespace(in);
@@ -62,7 +62,7 @@ optional<OrobaError> parse_expr(istream& in, Bytecode& out, LocalCollector& coll
     }
 }
 
-optional<OrobaError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector) {
+optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector) {
     int c = in.peek();
     ostringstream messagename;
     while (!isdigit(c) && !is_specialchar(c) && !is_whitespace(c) && c != EOF) {
@@ -83,7 +83,7 @@ optional<OrobaError> parse_message(bool has_target, istream& in, Bytecode& out, 
     return nullopt;
 }
 
-optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& collector) {
+optional<ParseError> parse_number(istream& in, Bytecode& out, LocalCollector& collector) {
     int64_t val = 0;
     int64_t digit = 1;
     int c = in.peek();
@@ -102,7 +102,7 @@ optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& co
     }
 }
 
-optional<OrobaError> parse_string(istream& in, Bytecode& out, LocalCollector& collector) {
+optional<ParseError> parse_string(istream& in, Bytecode& out, LocalCollector& collector) {
     // consume starting '"'
     in.get();
     ostringstream oss;
@@ -117,8 +117,8 @@ optional<OrobaError> parse_string(istream& in, Bytecode& out, LocalCollector& co
     return std::nullopt;
 }
 
-optional<OrobaError> error(string message) {
-    return OrobaError{message, 0, 0};
+optional<ParseError> error(string message) {
+    return ParseError{message, 0, 0};
 }
 
 void consume_whitespace(istream& in) {
