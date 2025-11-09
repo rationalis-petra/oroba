@@ -1,0 +1,11 @@
+
+
+Scope: 
+  - hmm...
+
+  - scope are parent objects...?
+    - yes, but:
+    - don't want all objects in same module to have same 'parent'
+    - perhaps instead objects have a 'scope object' slot? 
+
+ - 

@@ -1,0 +1,4 @@
+#ifndef __OROBA_OBJECT_USER_OBJECT_HPP
+#define __OROBA_OBJECT_USER_OBJECT_HPP
+
+#endif

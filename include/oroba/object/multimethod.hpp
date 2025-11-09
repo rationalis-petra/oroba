@@ -1,0 +1,5 @@
+#ifndef __OROBA_OBJECT_MULTIMETHOD_HPP
+#define __OROBA_OBJECT_MULTIMETHOD_HPP
+
+
+#endif
