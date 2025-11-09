@@ -8,6 +8,7 @@
 
 using namespace std;
 
+optional<ParseError> parse_statement(istream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_number(istream& in, Bytecode& out, LocalCollector& collector);
@@ -19,14 +20,14 @@ bool is_specialchar(int c);
 
 variant<Bytecode, ParseError> parse(istream& in, LocalCollector& collector) {
     Bytecode bytecode;
-    optional<ParseError> out = parse_expr(in, bytecode, collector);
+    optional<ParseError> out = parse_statement(in, bytecode, collector);
     if (out.has_value())
         return out.value();
     else
         return bytecode;
 }
     
-optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector) {
+optional<ParseError> parse_statement(istream& in, Bytecode& out, LocalCollector& collector) {
     bool has_target = false;
     while (true) {
         consume_whitespace(in);
@@ -62,6 +63,37 @@ optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& coll
     }
 }
 
+optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector) {
+    consume_whitespace(in);
+    int c = in.peek();
+    if (c == EOF) return error("error - end of file!");
+
+    if (c == '.') {
+        return error("unexpected end of statement in exprssion.");
+    }
+    else if (c == '(')
+        return error("not parsing groupings yet");
+    else if (c == '{')
+        return error("not parsing objects yet");
+    else if (c == '[')
+        return error("not parsing blocks yet");
+    else if (isdigit(c)) {
+        return parse_number(in, out, collector);
+    }
+    else if (c == '"') {
+        return parse_string(in, out, collector);
+    }
+    else if (is_specialchar(c)) {
+        return error("unexpected special char");
+    }
+    else {
+        // continue to parse message...
+        return error("not parsing message within message yet...");
+        //auto result = parse_message(false, in, out, collector);
+        //if (result.has_value()) return result;
+    }
+}
+
 optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector) {
     int c = in.peek();
     ostringstream messagename;
@@ -70,8 +102,14 @@ optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, 
         in.get();
         c = in.peek();
     }
-    if (c == ':') {
-        return error("not implemented - parse message with argument");
+    string message = messagename.str();
+    if (message.back() == ':') {
+        parse_expr(in, out, collector);
+        if (has_target) {
+            out.ops.push_back(OpCode::expl_message(messagename.str(), 1));
+        } else {
+            out.ops.push_back(OpCode::impl_message(messagename.str(), 1));
+        }
     } else {
         // no argument
         if (has_target) {

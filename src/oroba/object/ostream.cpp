@@ -15,7 +15,17 @@ OrobaObject* OStreamObject::SendMessage(bool internal, string name, vector<Oroba
         OrobaObject* result_tostr = arg->SendMessage(false, "to-string", vector<OrobaObject*>(), collector);
         StringObject* str = dynamic_cast<StringObject*>(result_tostr);
         if (str) {
-            ostream << str;
+            ostream << str->data;
+            return this;
+        } else {
+            throw OrobaError("Object did not convert to string; threfore cannot write to ostream.");
+        }
+    } else if (name == "write-ln:" && args.size() == 1) {
+        OrobaObject* arg = args[0];
+        OrobaObject* result_tostr = arg->SendMessage(false, "to-string", vector<OrobaObject*>(), collector);
+        StringObject* str = dynamic_cast<StringObject*>(result_tostr);
+        if (str) {
+            ostream << str->data << "\n";
             return this;
         } else {
             throw OrobaError("Object did not convert to string; threfore cannot write to ostream.");
