@@ -12,24 +12,24 @@ OrobaObject* PrimitiveObject::SendExternalMessage(string name, vector<OrobaObjec
         collector.Add(stringobj);
         return stringobj;
     } else 
-        return MessageNotFound(name, args);
+        return MessageNotFound(name, args, collector);
 }
 
 OrobaObject* PrimitiveObject::SendInternalMessage(string name, vector<OrobaObject*> args, LocalCollector& collector) {
     if (name == "to-string" && args.size() == 0)
         return this;
     else 
-        return MessageNotFound(name, args);
+        return MessageNotFound(name, args, collector);
 }
 
 
-// class PrimBool : public PrimitiveObject {
-// public:
-//     virtual string ToString() override;
+BooleanObject::BooleanObject(bool source) : val(source) {
+}
 
-// private:
-//     bool val;
-// };
+string BooleanObject::ToString() {
+    return val ? "true" : "false";
+}
+
 
 IntegerObject::IntegerObject(int64_t source) : val(source) {
 }

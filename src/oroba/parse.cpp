@@ -9,7 +9,7 @@
 using namespace std;
 
 optional<OrobaError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector);
-optional<OrobaError> parse_message(istream& in, Bytecode& out, LocalCollector& collector);
+optional<OrobaError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector);
 optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& collector);
 optional<OrobaError> parse_string(istream& in, Bytecode& out, LocalCollector& collector);
 optional<OrobaError> error(string message);
@@ -27,28 +27,60 @@ variant<Bytecode, OrobaError> parse(istream& in, LocalCollector& collector) {
 }
     
 optional<OrobaError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector) {
-    consume_whitespace(in);
-    int c = in.peek();
-    if (c == EOF) return error("error - end of file!");
+    bool has_target = false;
+    while (true) {
+        consume_whitespace(in);
+        int c = in.peek();
+        if (c == EOF) return error("error - end of file!");
 
-    if (c == '(')
-        return error("not parsing groupings yet");
-    else if (c == '{')
-        return error("not parsing objects yet");
-    else if (c == '[')
-        return error("not parsing blocks yet");
-    else if (isdigit(c))
-        return parse_number(in, out, collector);
-    else if (c == '"')
-        return parse_string(in, out, collector);
-    else if (is_specialchar(c))
-        return error("unexpected special char");
-    else 
-        return parse_message(in, out, collector);
+        if (c == '.') {
+            in.get();
+            return std::nullopt;
+        }
+        if (c == '(')
+            return error("not parsing groupings yet");
+        else if (c == '{')
+            return error("not parsing objects yet");
+        else if (c == '[')
+            return error("not parsing blocks yet");
+        else if (isdigit(c)) {
+            auto result = parse_number(in, out, collector);
+            if (result.has_value()) return result;
+        }
+        else if (c == '"') {
+            auto result = parse_string(in, out, collector);
+            if (result.has_value()) return result;
+        }
+        else if (is_specialchar(c)) {
+            return error("unexpected special char");
+        }
+        else {
+            auto result = parse_message(has_target, in, out, collector);
+            if (result.has_value()) return result;
+        }
+        has_target = true;
+    }
 }
 
-optional<OrobaError> parse_message(istream& in, Bytecode& out, LocalCollector& collector) {
-    return error("not implemented - parse message");
+optional<OrobaError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector) {
+    int c = in.peek();
+    ostringstream messagename;
+    while (!isdigit(c) && !is_specialchar(c) && !is_whitespace(c) && c != EOF) {
+        messagename << (char)c;
+        in.get();
+        c = in.peek();
+    }
+    if (c == ':') {
+        return error("not implemented - parse message with argument");
+    } else {
+        // no argument
+        if (has_target) {
+            out.ops.push_back(OpCode::expl_message(messagename.str(), 0));
+        } else {
+            out.ops.push_back(OpCode::impl_message(messagename.str(), 0));
+        }
+    }
+    return nullopt;
 }
 
 optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& collector) {
@@ -60,7 +92,7 @@ optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& co
         in.get();
         c = in.peek();
     }
-    if (is_whitespace(c)) {
+    if (is_whitespace(c) || c == '.') {
         OrobaObject* lit = new IntegerObject(val);
         collector.Add(lit);
         out.ops.push_back(OpCode::push(lit));

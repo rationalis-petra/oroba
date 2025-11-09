@@ -4,6 +4,6 @@
 #include "gc/collector.hpp"
 #include "oroba/data/bytecode.hpp"
 
-OrobaObject* eval(Bytecode code, OrobaObject* activation, LocalCollector& collector);
+OrobaObject* eval(Bytecode& code, OrobaObject* activation, LocalCollector& collector);
 
 #endif

@@ -13,12 +13,15 @@
 //
 // ------------------------------------------------------------------------
 
-class OrobaObject : public Collectable {
+class OrobaObject : public Collectable, public Tracer {
 public:
     virtual OrobaObject* SendExternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
     virtual OrobaObject* SendInternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
 
-    OrobaObject* MessageNotFound(std::string name, std::vector<OrobaObject*> args);
+    OrobaObject* MessageNotFound(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector);
+
+    // Tracer interface
+    virtual void Trace() override; 
 };
 
 #endif

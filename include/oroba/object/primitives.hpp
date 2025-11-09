@@ -14,8 +14,9 @@ public:
     virtual std::string ToString() = 0;
 };
 
-class PrimBool : public PrimitiveObject {
+class BooleanObject : public PrimitiveObject {
 public:
+    BooleanObject(bool source);
     virtual std::string ToString() override;
 
 private:

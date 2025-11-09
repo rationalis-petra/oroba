@@ -6,20 +6,20 @@
 
 #include "oroba/parse.hpp"
 #include "oroba/eval.hpp"
-
 #include "oroba/object/collections.hpp"
+#include "oroba/world/world.hpp"
 
 using namespace std;
 
 const string version = "0.0.0";
 
-bool repl_iter(istream& in, ostream& out, LocalCollector& collector) {
+bool repl_iter(istream& in, ostream& out, OrobaObject* active, LocalCollector& collector) {
     cout << "> ";
 
     variant<Bytecode, OrobaError> parsed = parse(in, collector);
     if (holds_alternative<Bytecode>(parsed)) {
         Bytecode code = get<Bytecode>(parsed);
-        OrobaObject* result = eval(code, nullptr, collector); 
+        OrobaObject* result = eval(code, active, collector); 
         OrobaObject* result_tostr = result->SendExternalMessage("to-string", vector<OrobaObject*>(), collector);
         StringObject* str = dynamic_cast<StringObject*>(result_tostr);
 
@@ -44,6 +44,14 @@ int main (int argc, char** argv) {
     cout << "  version: " << version << "\n";
 
     LocalCollector main_collector;
-    while (repl_iter(cin, cout, main_collector));
+    WorldObject* world = new WorldObject(main_collector);
+    main_collector.AddRoot(world);
+    main_collector.Add(world);
+    try {
+        while (repl_iter(cin, cout, world, main_collector));
+    } catch (std::string& err) {
+        cout << "Threw error indication exceptional circumstance:\n" << err << "\n";
+        cout.flush();
+    }
     return 0;
 }

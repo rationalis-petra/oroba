@@ -13,8 +13,9 @@
 //   start-object
 //   end-object
 
-#include <vector>
 #include <cstdint>
+#include <vector>
+#include <variant>
 
 #include "oroba/object/object.hpp"
 
@@ -27,30 +28,34 @@ enum class OpCodeType {
     AssignRW,
     StartObj,
     EndObj,
-    Nop, 
 };
 
 struct MessageOp {
-    uint16_t num_operands;
+    MessageOp(std::string _name, uint16_t _num_operands);
+
     std::string name;
+    uint16_t num_operands;
 };
 
 struct OpCode {
-    OpCode();
-    OpCode(const OpCode& rhs);
     ~OpCode();
 
     static OpCode push(OrobaObject* literal);
+    static OpCode impl_message(std::string messagename, uint16_t num_operands);
+    static OpCode expl_message(std::string messagename, uint16_t num_operands);
 
     OpCodeType type;
-    union {
-        MessageOp message;
-        OrobaObject* literal;
-    };
+    std::variant<MessageOp, OrobaObject*> payload;
+
+private: 
+    OpCode(MessageOp op);
+    OpCode(OrobaObject* lit);
 };
 
-struct Bytecode {
+struct Bytecode : public Tracer {
     std::vector<OpCode> ops;
+
+    virtual void Trace() override;
 };
 
 std::ostream& operator<<(std::ostream& out, Bytecode code);
