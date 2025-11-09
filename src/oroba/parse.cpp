@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "oroba/object/collections.hpp"
+#include "oroba/object/primitives.hpp"
 
 using namespace std;
 
@@ -51,7 +52,22 @@ optional<OrobaError> parse_message(istream& in, Bytecode& out, LocalCollector& c
 }
 
 optional<OrobaError> parse_number(istream& in, Bytecode& out, LocalCollector& collector) {
-    return error("not implemented - parse number!");
+    int64_t val = 0;
+    int64_t digit = 1;
+    int c = in.peek();
+    while (isdigit(c)) {
+        val += (c - 48) * digit;
+        in.get();
+        c = in.peek();
+    }
+    if (is_whitespace(c)) {
+        OrobaObject* lit = new IntegerObject(val);
+        collector.Add(lit);
+        out.ops.push_back(OpCode::push(lit));
+        return std::nullopt;
+    } else {
+        return error("encountered non-numeric character when parsing number!");
+    }
 }
 
 optional<OrobaError> parse_string(istream& in, Bytecode& out, LocalCollector& collector) {

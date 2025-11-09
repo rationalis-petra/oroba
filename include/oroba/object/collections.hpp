@@ -8,13 +8,12 @@
 
 class StringObject : public OrobaObject {
 public:
-    StringObject(string source);
-
-    virtual OrobaObject* SendExternalMessage(string name, vector<OrobaObject*> args) override;
-    virtual OrobaObject* SendInternalMessage(string name, vector<OrobaObject*> args) override;
+    StringObject(std::string source);
+    virtual OrobaObject* SendExternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& coll) override;
+    virtual OrobaObject* SendInternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& coll) override;
 
 public:
-    string data;
+    std::string data;
 };
 
 #endif

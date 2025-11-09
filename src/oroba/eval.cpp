@@ -15,7 +15,7 @@ OrobaObject* eval(Bytecode code, OrobaObject* init, LocalCollector& collector) {
         case OpCodeType::ImplMessage: {
             vector args(stack.end() - bc.message.num_operands, stack.end());
             stack.resize(stack.size() - bc.message.num_operands);
-            activation_objects.back()->SendInternalMessage(bc.message.name, args);
+            activation_objects.back()->SendInternalMessage(bc.message.name, args, collector);
             break;
         }
         case OpCodeType::ExplMessage: {
@@ -23,7 +23,7 @@ OrobaObject* eval(Bytecode code, OrobaObject* init, LocalCollector& collector) {
             stack.resize(stack.size() - bc.message.num_operands);
             OrobaObject* target = stack.back();
             stack.pop_back();
-            target->SendExternalMessage(bc.message.name, args);
+            target->SendExternalMessage(bc.message.name, args, collector);
             break;
         }
         case OpCodeType::Push: {

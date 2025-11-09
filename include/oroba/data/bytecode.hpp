@@ -32,7 +32,7 @@ enum class OpCodeType {
 
 struct MessageOp {
     uint16_t num_operands;
-    string name;
+    std::string name;
 };
 
 struct OpCode {

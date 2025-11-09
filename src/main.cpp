@@ -20,7 +20,7 @@ bool repl_iter(istream& in, ostream& out, LocalCollector& collector) {
     if (holds_alternative<Bytecode>(parsed)) {
         Bytecode code = get<Bytecode>(parsed);
         OrobaObject* result = eval(code, nullptr, collector); 
-        OrobaObject* result_tostr = result->SendExternalMessage("to-string", vector<OrobaObject*>());
+        OrobaObject* result_tostr = result->SendExternalMessage("to-string", vector<OrobaObject*>(), collector);
         StringObject* str = dynamic_cast<StringObject*>(result_tostr);
 
         if (str) {

@@ -7,8 +7,6 @@
 
 #include "gc/collector.hpp"
 
-using namespace std;
-
 // ------------------------------------------------------------------------
 //   Oroba Object 
 // ---------
@@ -17,10 +15,10 @@ using namespace std;
 
 class OrobaObject : public Collectable {
 public:
-    virtual OrobaObject* SendExternalMessage(string name, vector<OrobaObject*> args) = 0;
-    virtual OrobaObject* SendInternalMessage(string name, vector<OrobaObject*> args) = 0;
+    virtual OrobaObject* SendExternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
+    virtual OrobaObject* SendInternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
 
-    OrobaObject* MessageNotFound(string name, vector<OrobaObject*> args);
+    OrobaObject* MessageNotFound(std::string name, std::vector<OrobaObject*> args);
 };
 
 #endif

@@ -4,28 +4,28 @@
 #include <stdint.h>
 #include <string>
 
-#include "object/object.hpp"
+#include "oroba/object/object.hpp"
 
 class PrimitiveObject : public OrobaObject {
 public:
-    virtual OrobaObject SendExternalMessage(string name, vector<OraObject> args) override;
-    virtual OrobaObject SendInternalMessage(string name, vector<OraObject> args) override;
+    virtual OrobaObject* SendExternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
+    virtual OrobaObject* SendInternalMessage(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
 
-    virtual string ToString() = 0;
-}
+    virtual std::string ToString() = 0;
+};
 
 class PrimBool : public PrimitiveObject {
 public:
-    virtual string ToString() override;
+    virtual std::string ToString() override;
 
 private:
     bool val;
 };
 
-class PrimInteger : public PrimitiveObject {
+class IntegerObject : public PrimitiveObject {
 public:
-    PrimInteger(int64_t val);
-    virtual string ToString() override;
+    IntegerObject(int64_t source);
+    virtual std::string ToString() override;
 
     // TODO: convert to big-int
     uint64_t val;
@@ -34,14 +34,14 @@ public:
 class PrimF32 : public PrimitiveObject {
 public:
     PrimF32(float val);
-    virtual string ToString() override;
+    virtual std::string ToString() override;
     float val;
 };
 
 class PrimF64 : public PrimitiveObject {
 public:
     PrimF64(double val);
-    virtual string ToString() override;
+    virtual std::string ToString() override;
     double val;
 };
 
