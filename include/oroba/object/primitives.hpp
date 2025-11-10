@@ -12,6 +12,12 @@ public:
     virtual std::string ToString() = 0;
 };
 
+class NilObject : public PrimitiveObject {
+public:
+    virtual std::string ToString() override;
+    static NilObject* nil;
+};
+
 class BooleanObject : public PrimitiveObject {
 public:
     BooleanObject(bool source);

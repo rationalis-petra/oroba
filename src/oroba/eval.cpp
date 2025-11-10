@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "oroba/data/error.hpp"
+#include "oroba/object/primitives.hpp"
 
 using namespace std;
 
@@ -54,12 +55,33 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             break;
         }
         case OpCodeType::MakeMethod: {
-            throw InternalError("not implemented: make method");
+            MakeObject mo = get<MakeObject>(op.payload);
+            OrobaObject* obj = new OrobaObject;
+            for (auto slot : mo.slots) {
+                obj->slots[slot.first] = NilObject::nil;
+            }
+            for (auto to_init : mo.to_initialize) {
+                obj->slots[to_init] = stack.back();
+                stack.pop_back();
+            }
+            collector.Add(obj);
+
+            OrobaObject* result = 
+
+            stack.push_back(obj);
             break;
         }
         case OpCodeType::MakeObject: {
             MakeObject mo = get<MakeObject>(op.payload);
             OrobaObject* obj = new OrobaObject;
+            for (auto slot : mo.slots) {
+                obj->slots[slot.first] = NilObject::nil;
+            }
+            for (auto to_init : mo.to_initialize) {
+                obj->slots[to_init] = stack.back();
+                stack.pop_back();
+            }
+
             collector.Add(obj);
             stack.push_back(obj);
             break;

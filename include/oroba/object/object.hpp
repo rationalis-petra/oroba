@@ -18,6 +18,7 @@ enum class Visibility {Public, Private};
 struct SlotDescriptor {
     Visibility read_visibility;
     Visibility write_visibility;
+    bool is_initialized;
     bool can_write;
     bool is_argslot;
     int parent_priority;
@@ -33,7 +34,6 @@ public:
     // Tracer interface
     virtual void Trace() override; 
 
-protected:
     std::unordered_map<std::string, OrobaObject*> slots;
 };
 

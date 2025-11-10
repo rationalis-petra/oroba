@@ -17,6 +17,10 @@ OrobaObject* PrimitiveObject::SendMessage(bool internal, string name, vector<Oro
     }
 }
 
+NilObject* NilObject::nil = nullptr;
+
+string NilObject::ToString() { return "nil"; }
+
 BooleanObject::BooleanObject(bool source) : val(source) {}
 
 OrobaObject* BooleanObject::SendMessage(bool internal, string name, vector<OrobaObject*> args, LocalCollector& collector) {

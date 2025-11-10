@@ -13,6 +13,9 @@ WorldObject::WorldObject(LocalCollector& collector) {
     slots["os"] = new OSObject(collector);
     slots["system"] = new SystemObject(collector);
 
+    NilObject::nil = new NilObject();
+    slots["nil"] = NilObject::nil;
+
     for (auto& pr : slots) {
         collector.Add(pr.second);
     }
