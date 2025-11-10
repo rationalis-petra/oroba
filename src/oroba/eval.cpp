@@ -66,14 +66,12 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             }
             collector.Add(obj);
 
-            OrobaObject* result = 
-
             stack.push_back(obj);
             break;
         }
         case OpCodeType::MakeObject: {
             MakeObject mo = get<MakeObject>(op.payload);
-            OrobaObject* obj = new OrobaObject;
+            UserObject* obj = new UserObject;
             for (auto slot : mo.slots) {
                 obj->slots[slot.first] = NilObject::nil;
             }
@@ -81,9 +79,14 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
                 obj->slots[to_init] = stack.back();
                 stack.pop_back();
             }
-
             collector.Add(obj);
-            stack.push_back(obj);
+
+            if (mo.code->ops.size() == 0) {
+                stack.push_back(obj);
+            } else {
+                obj->code = mo.code;
+                stack.push_back(obj->Evaluate(collector));
+            }
             break;
         }
         default:

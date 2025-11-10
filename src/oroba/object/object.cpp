@@ -1,5 +1,6 @@
 #include "oroba/object/object.hpp"
 
+#include "oroba/eval.hpp"
 #include "oroba/data/error.hpp"
 #include "oroba/object/collections.hpp"
 
@@ -32,10 +33,22 @@ OrobaObject* OrobaObject::Evaluate(LocalCollector& collector) {
     return this;
 }
 
-
 void OrobaObject::Trace() {
     tagged = true;
     for (auto& pr : slots) {
         pr.second->Trace();
     }
+}
+
+OrobaObject* UserObject::Evaluate(LocalCollector& collector) {
+    if (code == nullptr) {
+        return this;
+    } else {
+        return eval(*code, this, collector);
+    }
+}
+
+void UserObject::Trace() {
+    OrobaObject::Trace();
+    if (code) { code->Trace(); }
 }

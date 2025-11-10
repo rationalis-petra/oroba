@@ -144,11 +144,7 @@ optional<ParseError> parse_object(istream& in, Bytecode& out, LocalCollector& co
 
     if (result.has_value()) return result;
 
-    if (object_bytecode->ops.size() == 0) {
-        out.ops.push_back(OpCode::make_object(slots, to_initialize));
-    } else {
-        out.ops.push_back(OpCode::make_method(slots, to_initialize, object_bytecode));
-    }
+    out.ops.push_back(OpCode::make_object(slots, to_initialize, object_bytecode));
     return std::nullopt;
 }
 

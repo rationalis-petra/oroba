@@ -3,26 +3,17 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 #include "gc/collector.hpp"
+#include "oroba/data/bytecode.hpp"
 
 // ------------------------------------------------------------------------
 //   Oroba Object 
 // ---------
 //
 // ------------------------------------------------------------------------
-
-enum class Visibility {Public, Private};
-
-struct SlotDescriptor {
-    Visibility read_visibility;
-    Visibility write_visibility;
-    bool is_initialized;
-    bool can_write;
-    bool is_argslot;
-    int parent_priority;
-};
 
 class OrobaObject : public Collectable, public Tracer {
 public:
@@ -40,6 +31,16 @@ public:
 class MethodObject : public OrobaObject {
 public:
     virtual OrobaObject* MakeActivationObject(std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
+};
+
+class UserObject : public OrobaObject {
+public:
+    virtual OrobaObject* Evaluate(LocalCollector& collector) override;
+
+    // Tracer interface
+    virtual void Trace() override; 
+
+    std::shared_ptr<Bytecode> code = nullptr;
 };
 
 #endif

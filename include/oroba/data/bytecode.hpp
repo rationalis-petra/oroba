@@ -17,9 +17,23 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <string>
 #include <variant>
 
-#include "oroba/object/object.hpp"
+#include "gc/collector.hpp"
+
+struct OrobaObject;
+
+enum class Visibility {Public, Private};
+
+struct SlotDescriptor {
+    Visibility read_visibility;
+    Visibility write_visibility;
+    bool is_initialized;
+    bool can_write;
+    bool is_argslot;
+    int parent_priority;
+};
 
 enum class OpCodeType {
     ImplMessage,
@@ -63,10 +77,12 @@ struct MakeMethod {
 
 struct MakeObject {
     MakeObject(std::unordered_map<std::string, SlotDescriptor> slots,
-               std::vector<std::string> to_initialize);
+               std::vector<std::string> to_initialize,
+               std::shared_ptr<Bytecode> code);
 
     std::unordered_map<std::string, SlotDescriptor> slots;
     std::vector<std::string> to_initialize;
+    std::shared_ptr<Bytecode> code;
 };
 
 struct OpCode {
@@ -74,7 +90,8 @@ struct OpCode {
 
     static OpCode push(OrobaObject* literal);
     static OpCode make_object(std::unordered_map<std::string, SlotDescriptor> slots,
-                              std::vector<std::string> to_initialize);
+                              std::vector<std::string> to_initialize,
+                              std::shared_ptr<Bytecode> code);
     static OpCode make_method(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::vector<std::string> to_initialize,
                               std::shared_ptr<Bytecode> code);

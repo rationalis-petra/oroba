@@ -2,6 +2,8 @@
 
 #include <ostream>
 
+#include "oroba/object/object.hpp"
+
 using namespace std;
 
 MessageOp::MessageOp(string _name, uint16_t _num_operands)
@@ -24,9 +26,11 @@ MakeMethod::MakeMethod(std::unordered_map<std::string, SlotDescriptor> _slots,
     , code(_code) { }
 
 MakeObject::MakeObject(std::unordered_map<std::string, SlotDescriptor> _slots,
-                       std::vector<std::string> _to_initialize)
+                       std::vector<std::string> _to_initialize,
+                       std::shared_ptr<Bytecode> _code)
     : slots(_slots)
-    , to_initialize(_to_initialize) { }
+    , to_initialize(_to_initialize)
+    , code(_code) { }
 
 OpCode::~OpCode() {
 }
@@ -38,8 +42,9 @@ OpCode OpCode::push(OrobaObject* literal) {
 }
 
 OpCode OpCode::make_object(std::unordered_map<std::string, SlotDescriptor> slots,
-                          std::vector<std::string> to_initialize) {
-    OpCode out(MakeObject(slots, to_initialize));
+                           std::vector<std::string> to_initialize,
+                           std::shared_ptr<Bytecode> code) {
+    OpCode out(MakeObject(slots, to_initialize, code));
     out.type = OpCodeType::MakeObject;
     return out;
 }
