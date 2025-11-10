@@ -10,7 +10,8 @@ using namespace std;
 OStreamObject::OStreamObject(std::ostream& _ostream) : ostream(_ostream) {}
 
 OrobaObject* OStreamObject::SendMessage(bool internal, string name, vector<OrobaObject*> args, LocalCollector& collector) {
-    if (name == "write:" && args.size() == 1) {
+    if (name == "write:") {
+        // TODO: throw error if wrong number of args
         OrobaObject* arg = args[0];
         OrobaObject* result_tostr = arg->SendMessage(false, "to-string", vector<OrobaObject*>(), collector);
         StringObject* str = dynamic_cast<StringObject*>(result_tostr);
@@ -20,7 +21,8 @@ OrobaObject* OStreamObject::SendMessage(bool internal, string name, vector<Oroba
         } else {
             throw OrobaError("Object did not convert to string; threfore cannot write to ostream.");
         }
-    } else if (name == "write-ln:" && args.size() == 1) {
+    } else if (name == "write-ln:") {
+        // TODO: throw error if wrong number of args
         OrobaObject* arg = args[0];
         OrobaObject* result_tostr = arg->SendMessage(false, "to-string", vector<OrobaObject*>(), collector);
         StringObject* str = dynamic_cast<StringObject*>(result_tostr);
@@ -34,7 +36,7 @@ OrobaObject* OStreamObject::SendMessage(bool internal, string name, vector<Oroba
         OrobaObject* out = new StringObject("*standard output port*");
         collector.Add(out);
         return out;
-    } else  {
-        return MessageNotFound(name, args, collector);
+    } else {
+        return OrobaObject::SendMessage(internal, name, args, collector);
     }
 }

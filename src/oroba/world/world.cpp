@@ -1,17 +1,19 @@
 #include "oroba/world/world.hpp"
 
 #include "oroba/object/primitives.hpp"
-#include "oroba/world/ports.hpp"
+#include "oroba/world/system.hpp"
+#include "oroba/world/os.hpp"
 
 using namespace std;
 
 WorldObject::WorldObject(LocalCollector& collector) {
-    children["true"] = new BooleanObject(true);
-    children["false"] = new BooleanObject(false);
+    slots["true"] = new BooleanObject(true);
+    slots["false"] = new BooleanObject(false);
 
-    children["ports"] = new PortsObject(collector);
+    slots["os"] = new OSObject(collector);
+    slots["system"] = new SystemObject(collector);
 
-    for (auto& pr : children) {
+    for (auto& pr : slots) {
         collector.Add(pr.second);
     }
 }

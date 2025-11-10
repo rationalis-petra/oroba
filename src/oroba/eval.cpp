@@ -49,22 +49,24 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             stack.pop_back();
             break;
         }
-        case OpCodeType::AssignR: {
-            throw "not implemented: eval AssignR";
+        case OpCodeType::MakeBlock: {
+            throw InternalError("not implemented: eval make block");
             break;
         }
-        case OpCodeType::AssignRW: {
-            throw "not implemented: eval AssignRW";
+        case OpCodeType::MakeMethod: {
+            throw InternalError("not implemented: make method");
             break;
         }
-        case OpCodeType::StartObj: {
-            throw "not implemented: eval StartObj";
+        case OpCodeType::MakeObject: {
+            MakeObject mo = get<MakeObject>(op.payload);
+            OrobaObject* obj = new OrobaObject;
+            collector.Add(obj);
+            stack.push_back(obj);
             break;
         }
-        case OpCodeType::EndObj: {
-            throw "not implemented: eval EndObj";
+        default:
+            throw InternalError("unrecognized bytecode");
             break;
-        }
         }
     }
 

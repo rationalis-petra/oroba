@@ -9,13 +9,13 @@
 class PrimitiveObject : public OrobaObject {
 public:
     virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
-
     virtual std::string ToString() = 0;
 };
 
 class BooleanObject : public PrimitiveObject {
 public:
     BooleanObject(bool source);
+    virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
     virtual std::string ToString() override;
 
 private:

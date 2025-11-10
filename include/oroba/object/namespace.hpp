@@ -7,14 +7,6 @@
 
 #include "oroba/object/object.hpp"
 
-class NamespaceObject : public OrobaObject {
-public:
-    virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& coll) override;
-    
-    virtual void Trace() override; 
-
-protected:
-    std::unordered_map<std::string, OrobaObject*> children;
-};
+class NamespaceObject : public OrobaObject { };
 
 #endif
