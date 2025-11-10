@@ -21,6 +21,17 @@ OrobaObject* OrobaObject::SendMessage(bool internal, std::string name, std::vect
         }
     }
 
+    // TODO: better way of mutating slot values?
+    if (name.back() == ':') {
+        string slotname = name.substr(0, name.size() - 1); 
+        auto res2 = slots.find(slotname);
+        if (res2 != end(slots)) {
+            // TODO: check for 1 arg
+            slots[slotname] = args[0];
+            return this;
+        }
+    }
+
     return MessageNotFound(name, args, collector);
 }
 

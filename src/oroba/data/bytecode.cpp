@@ -41,6 +41,12 @@ OpCode OpCode::push(OrobaObject* literal) {
     return out;
 }
 
+OpCode OpCode::pop() {
+    OpCode out(nullptr);
+    out.type = OpCodeType::Pop;
+    return out;
+}
+
 OpCode OpCode::make_object(std::unordered_map<std::string, SlotDescriptor> slots,
                            std::vector<std::string> to_initialize,
                            std::shared_ptr<Bytecode> code) {

@@ -89,6 +89,7 @@ struct OpCode {
     ~OpCode();
 
     static OpCode push(OrobaObject* literal);
+    static OpCode pop();
     static OpCode make_object(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::vector<std::string> to_initialize,
                               std::shared_ptr<Bytecode> code);

@@ -139,10 +139,16 @@ optional<ParseError> parse_object(istream& in, Bytecode& out, LocalCollector& co
         in.get();
     }
 
-    auto result = parse_statement(in, '}', *object_bytecode, collector);
+    c = in.peek();
+    bool run = false;
+    while (c != '}') {
+        if (run) object_bytecode->ops.push_back(OpCode::pop());
+        auto result = parse_statement(in, '}', *object_bytecode, collector);
+        if (result.has_value()) return result;
+        c = in.peek();
+        run = true;
+    }
     in.get();
-
-    if (result.has_value()) return result;
 
     out.ops.push_back(OpCode::make_object(slots, to_initialize, object_bytecode));
     return std::nullopt;
@@ -283,13 +289,16 @@ optional<ParseError> parse_number(istream& in, Bytecode& out, LocalCollector& co
         in.get();
         c = in.peek();
     }
-    if (is_whitespace(c) || c == '.') {
+
+    if (is_whitespace(c) || c == '.' || is_specialchar(c)) {
         OrobaObject* lit = new IntegerObject(val);
         collector.Add(lit);
         out.ops.push_back(OpCode::push(lit));
         return std::nullopt;
     } else {
-        return error("encountered non-numeric character when parsing number!");
+        ostringstream oss;
+        oss << "encountered non-numeric character when parsing number: " << (char)c;
+        return error(oss.str());
     }
 }
 
@@ -332,6 +341,7 @@ bool is_specialchar(int c) {
         || c == ']'
         || c == '{'
         || c == '}'
+        || c == '|'
         || c == '.'
         || c == '"';
 }
