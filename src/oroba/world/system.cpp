@@ -8,15 +8,15 @@
 using namespace std;
 
 SystemObject::SystemObject(LocalCollector& collector) {
-    AddMethod("exit", Method(new TypedPrimitiveMethod<>("exit",
-                                                        [](LocalCollector& collector) -> OrobaObject* { exit(0); })));
+    AddMethod("exit", Method(new TypedPrimitiveMethod<>(
+      "exit",
+      [](LocalCollector& collector) -> OrobaObject* { exit(0); })
+    ));
 
-    /*
-    methods["exit:"] = new PrimitiveMethod<IntegerObject*>(
+    AddMethod("exit:", new TypedPrimitiveMethod<IntegerObject*>(
       "exit:",
       [](IntegerObject* obj, LocalCollector& collector) -> OrobaObject* { exit(obj->val); }
-    );
-    */
+    ));
 
     PostAssignmentSetup(collector);
 }
