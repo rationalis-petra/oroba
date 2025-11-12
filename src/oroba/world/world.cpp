@@ -7,16 +7,14 @@
 using namespace std;
 
 WorldObject::WorldObject(LocalCollector& collector) {
-    slots["true"] = new BooleanObject(true);
-    slots["false"] = new BooleanObject(false);
+    AddValue("true", new BooleanObject(true));
+    AddValue("false", new BooleanObject(false));
 
-    slots["os"] = new OSObject(collector);
-    slots["system"] = new SystemObject(collector);
+    //AddValue("os", new OSObject(collector));
+    //AddValue("system", new SystemObject(collector));
 
     NilObject::nil = new NilObject();
-    slots["nil"] = NilObject::nil;
+    AddValue("nil", NilObject::nil);
 
-    for (auto& pr : slots) {
-        collector.Add(pr.second);
-    }
+    PostAssignmentSetup(collector);
 }

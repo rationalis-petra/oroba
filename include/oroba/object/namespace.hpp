@@ -5,8 +5,12 @@
 #include <unordered_map>
 #include <string>
 
-#include "oroba/object/object.hpp"
+#include "oroba/object/composite.hpp"
 
-class NamespaceObject : public OrobaObject { };
+struct NamespaceObject : public CompositeObject {
+    void AddMethod();
+    void AddValue(std::string name, OrobaObject* value);
+    void PostAssignmentSetup(LocalCollector& collector);
+};
 
 #endif

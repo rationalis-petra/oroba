@@ -27,44 +27,22 @@ template <int idx, class Arg, class... Args> std::tuple<Arg, Args...> convert_to
 }
 
 template <class... Args>
-class PrimitiveMethodActivation : public OrobaObject {
+class TypedPrimitiveMethod : public PrimitiveMethod {
 public:
-    PrimitiveMethodActivation(std::function<OrobaObject*(Args... args, LocalCollector& collector)> method, std::tuple<Args...> args)
-        : m_method(method)
-        , m_args(args) {}
+    TypedPrimitiveMethod(std::string name, std::function<OrobaObject*(Args... args, LocalCollector& collector)> method) : m_method(method) {};
 
-    virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override {
-        throw InternalError("not-implemented: receiving messages as a primitive method");
-    };
-
-    virtual OrobaObject* Evaluate(LocalCollector& collector) override {
-        return std::apply(m_method, std::tuple_cat(m_args, std::tuple<LocalCollector&>(collector)));
-    };
-
-private:
-    std::tuple<Args...> m_args;
-    std::function<OrobaObject*(Args... args, LocalCollector& collector)> m_method;
-};
-
-template <class... Args>
-class PrimitiveMethod : public MethodObject {
-public:
-    PrimitiveMethod(std::string name, std::function<OrobaObject*(Args... args, LocalCollector& collector)> method) : m_method(method) {};
-    virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override {
-        throw InternalError("not-implemented: receiving messages as a primitive method");
-    }
-
-    virtual OrobaObject* MakeActivationObject(std::vector<OrobaObject*> args, LocalCollector& collector) override {
+    virtual OrobaObject* Invoke(std::vector<OrobaObject*> args, LocalCollector& collector) override {
         if (args.size() == sizeof...(Args)) {
-            PrimitiveMethodActivation<Args...>* activation = new PrimitiveMethodActivation<Args...>(m_method, convert_to_tuple<0, Args...>(args));
-            collector.Add(activation);
-            return activation;
+            auto args_tuple = convert_to_tuple<Args...>(args);
+            return std::apply(m_method, std::tuple_cat(args_tuple, std::tuple<LocalCollector&>(collector)));
         } else {
             std::ostringstream oss;
             oss << "incorrect number of args - expected " << sizeof...(Args) << " but have " << args.size();
             throw InternalError(oss.str());
         }
     }
+
+    virtual void Trace() override {}; 
 
 private:
     std::string m_name;

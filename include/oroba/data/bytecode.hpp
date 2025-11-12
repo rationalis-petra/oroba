@@ -31,7 +31,6 @@ struct SlotDescriptor {
     Visibility write_visibility;
     bool is_initialized;
     bool can_write;
-    bool is_argslot;
     int parent_priority;
 };
 
@@ -42,7 +41,6 @@ enum class OpCodeType {
     Pop,
     MakeBlock,
     MakeObject,
-    MakeMethod,
 };
 
 struct Bytecode;
@@ -65,24 +63,19 @@ public:
     std::shared_ptr<Bytecode> code;
 };
 
-struct MakeMethod {
-    MakeMethod(std::unordered_map<std::string, SlotDescriptor> slots,
-               std::vector<std::string> to_initialize,
-               std::shared_ptr<Bytecode> code);
-
-    std::unordered_map<std::string, SlotDescriptor> slots;
-    std::vector<std::string> to_initialize;
+struct MethodDescriptor {
+    std::vector<std::string> args;
     std::shared_ptr<Bytecode> code;
 };
 
 struct MakeObject {
     MakeObject(std::unordered_map<std::string, SlotDescriptor> slots,
                std::vector<std::string> to_initialize,
-               std::shared_ptr<Bytecode> code);
+               std::unordered_map<std::string, MethodDescriptor> methods);
 
     std::unordered_map<std::string, SlotDescriptor> slots;
+    std::unordered_map<std::string, MethodDescriptor> methods;
     std::vector<std::string> to_initialize;
-    std::shared_ptr<Bytecode> code;
 };
 
 struct OpCode {
@@ -92,10 +85,7 @@ struct OpCode {
     static OpCode pop();
     static OpCode make_object(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::vector<std::string> to_initialize,
-                              std::shared_ptr<Bytecode> code);
-    static OpCode make_method(std::unordered_map<std::string, SlotDescriptor> slots,
-                              std::vector<std::string> to_initialize,
-                              std::shared_ptr<Bytecode> code);
+                              std::unordered_map<std::string, MethodDescriptor> methods);
     static OpCode make_block(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::vector<std::string> to_initialize,
                               std::shared_ptr<Bytecode> code);
@@ -103,13 +93,12 @@ struct OpCode {
     static OpCode expl_message(std::string messagename, uint16_t num_operands);
 
     OpCodeType type;
-    std::variant<MessageOp, OrobaObject*, MakeObject, MakeMethod, MakeBlock> payload;
+    std::variant<MessageOp, OrobaObject*, MakeObject, MakeBlock> payload;
 
 private: 
     OpCode(MessageOp op);
     OpCode(OrobaObject* lit);
     OpCode(MakeObject obj_desc);
-    OpCode(MakeMethod method_desc);
     OpCode(MakeBlock block_desc);
 };
 

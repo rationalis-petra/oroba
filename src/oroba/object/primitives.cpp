@@ -13,7 +13,7 @@ OrobaObject* PrimitiveObject::SendMessage(bool internal, string name, vector<Oro
         collector.Add(stringobj);
         return stringobj;
     } else {
-        return SendMessage(internal, name, args, collector);
+        return OrobaObject::SendMessage(internal, name, args, collector);
     }
 }
 
@@ -31,9 +31,9 @@ OrobaObject* BooleanObject::SendMessage(bool internal, string name, vector<Oroba
         } else {
             return args[1]->SendMessage(false, "call", vector<OrobaObject*>{}, collector);
         }
-    } else {
-        return SendMessage(internal, name, args, collector);
-    }
+    } 
+
+    return PrimitiveObject::SendMessage(internal, name, args, collector);
 }
 
 string BooleanObject::ToString() {

@@ -4,6 +4,7 @@
 
 #include "oroba/data/error.hpp"
 #include "oroba/object/primitives.hpp"
+#include "oroba/object/composite.hpp"
 
 using namespace std;
 
@@ -54,39 +55,42 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             throw InternalError("not implemented: eval make block");
             break;
         }
-        case OpCodeType::MakeMethod: {
-            MakeObject mo = get<MakeObject>(op.payload);
-            OrobaObject* obj = new OrobaObject;
-            for (auto slot : mo.slots) {
-                obj->slots[slot.first] = NilObject::nil;
-            }
-            for (auto to_init : mo.to_initialize) {
-                obj->slots[to_init] = stack.back();
-                stack.pop_back();
-            }
-            collector.Add(obj);
-
-            stack.push_back(obj);
-            break;
-        }
         case OpCodeType::MakeObject: {
             MakeObject mo = get<MakeObject>(op.payload);
-            UserObject* obj = new UserObject;
-            for (auto slot : mo.slots) {
-                obj->slots[slot.first] = NilObject::nil;
+            CompositeObject* obj = new CompositeObject;
+            for (auto sldesc : mo.slots) {
+                SlotDescriptor desc = sldesc.second;
+                string name = sldesc.first;
+                Slot slot;
+                slot.parent_priority = desc.parent_priority;
+                slot.object = NilObject::nil;
+                obj->slots[name] = slot;
+
+                // Slot methods
+                SlotMethod m{false, name};
+                obj->methods[name] = Method(m);
+
+                if (desc.can_write) {
+                    string settername = name + ":";
+                    SlotMethod m{true, name};
+                    obj->methods[settername] = Method(m);
+                }
             }
             for (auto to_init : mo.to_initialize) {
-                obj->slots[to_init] = stack.back();
+                obj->slots[to_init].object = stack.back();
                 stack.pop_back();
             }
-            collector.Add(obj);
-
-            if (mo.code->ops.size() == 0) {
-                stack.push_back(obj);
-            } else {
-                obj->code = mo.code;
-                stack.push_back(obj->Evaluate(collector));
+            for (auto sldesc : mo.methods) {
+                MethodDescriptor desc = sldesc.second;
+                UserMethod method;
+                method.args = desc.args;
+                method.body = *desc.code;
+                obj->methods[sldesc.first] = method;
             }
+            // TODO: add methods
+
+            collector.Add(obj);
+            stack.push_back(obj);
             break;
         }
         default:

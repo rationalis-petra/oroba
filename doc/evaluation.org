@@ -9,3 +9,65 @@ Scope:
     - perhaps instead objects have a 'scope object' slot? 
 
  - 
+
+* Conceptual Model
+What is an object?
+- An object is something that responds to messages.
+- How does an object respond to messages?
+
+- 'primitive' objects understand 'primitive' messages, which may discriminate on
+  the 'type' of the object being received. For example:
+  - the 'int+' primitive object may receive the primitive message '_value' with operands
+    1 and 2. It will then return the primitive value 3.
+  - 'primitive' objects DO NOT understand any messages except primtive ones.
+
+- 'composite' or 'user' objects are different. They are more complex, and have
+  several components:
+  - (Optional) an expression, which is made of code.
+  - Slots, which are a map of name → (object × bool),
+      where the 'bool' indicates privacy.
+  - Methods, which indicate how to respond to messages.
+
+   { | parent* traits point.
+       x <- 12.
+       y <- 3. |
+
+     to-string -> x to-string; cat: y to-string.
+     add: other -> clone x: (x + other x); y: (y + other y).
+     echo: source -> (
+         stdout write: "echoing point:".
+         stdout write-ln: to-string.
+       )
+     
+    }  
+
+  Responding to a message:  
+  - when a message is sent to a composite object:
+    - If the method is a getter/setter, then the slot value is get/set.
+      Setters also return the object directly.
+    - If it is a method, then the following happens:
+      - A new object, the *method activation object* is created, with a parent slot pointing to the current object
+      - The new object also has some additional slots, such as the arguments, 'thisContext' and 'self'
+      - The body is evaluated as a series of messages sent to the method
+        activation object.
+
+* Syntax:
+
+Literals:
+- Numeric: 1, 2, etc.
+- String: "hello, world!" 
+
+Objects:
+Body = .
+
+{ | mut-slot-1 <- expr. mut-slot-2 <- expr ?. | body }
+
+expr = message+
+
+message = expr, expr, expr ... 
+        | symbol
+        | symbol: expr symbol: expr 
+        | operator expr
+
+
+call: 

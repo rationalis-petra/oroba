@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <optional>
 #include <unordered_map>
 
 #include "gc/collector.hpp"
@@ -15,32 +16,41 @@
 //
 // ------------------------------------------------------------------------
 
+struct PrimitiveMethod {
+    virtual OrobaObject* Invoke(std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
+};
+
+struct SlotMethod {
+    bool is_setter;
+    std::string slot;
+};
+
+struct UserMethod {
+    std::vector<std::string> args;
+    Bytecode body;
+};
+
+struct Method : public Tracer, Collectable {
+    Method();
+    Method(SlotMethod slot_method);
+    Method(UserMethod user_method);
+    Method(PrimitiveMethod* prim_method);
+
+    std::variant<SlotMethod, UserMethod, PrimitiveMethod*> method;
+    virtual void Trace() override;
+    virtual void AddToCollector(LocalCollector& collector);
+};
+
+class CompositeObject;
+
 class OrobaObject : public Collectable, public Tracer {
 public:
     virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector);
-    virtual OrobaObject* Evaluate(LocalCollector& collector);
-
+    virtual std::optional<std::pair<CompositeObject*, Method>> MethodLookup(std::string name);
     OrobaObject* MessageNotFound(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector);
 
     // Tracer interface
     virtual void Trace() override; 
-
-    std::unordered_map<std::string, OrobaObject*> slots;
-};
-
-class MethodObject : public OrobaObject {
-public:
-    virtual OrobaObject* MakeActivationObject(std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
-};
-
-class UserObject : public OrobaObject {
-public:
-    virtual OrobaObject* Evaluate(LocalCollector& collector) override;
-
-    // Tracer interface
-    virtual void Trace() override; 
-
-    std::shared_ptr<Bytecode> code = nullptr;
 };
 
 #endif
