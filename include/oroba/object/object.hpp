@@ -16,7 +16,7 @@
 //
 // ------------------------------------------------------------------------
 
-struct PrimitiveMethod {
+struct PrimitiveMethod : public Collectable {
     virtual OrobaObject* Invoke(std::vector<OrobaObject*> args, LocalCollector& collector) = 0;
 };
 

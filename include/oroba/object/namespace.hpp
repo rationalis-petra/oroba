@@ -8,7 +8,7 @@
 #include "oroba/object/composite.hpp"
 
 struct NamespaceObject : public CompositeObject {
-    void AddMethod();
+    void AddMethod(std::string name, Method method);
     void AddValue(std::string name, OrobaObject* value);
     void PostAssignmentSetup(LocalCollector& collector);
 };

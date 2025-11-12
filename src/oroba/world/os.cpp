@@ -7,7 +7,7 @@
 using namespace std;
 
 OSObject::OSObject(LocalCollector& collector) {
-    //slots["stdout"] = new OStreamObject(cout);
+    AddValue("stdout", new OStreamObject(cout));
 
     for (auto& pr : slots) {
         collector.Add(pr.second.object);

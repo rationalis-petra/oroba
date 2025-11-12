@@ -2,7 +2,8 @@
 
 using namespace std;
 
-void NamespaceObject::AddMethod() {
+void NamespaceObject::AddMethod(std::string name, Method method) {
+    methods[name] = method;
 } 
 
 void NamespaceObject::AddValue(std::string name, OrobaObject* value) {

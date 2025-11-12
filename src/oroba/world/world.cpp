@@ -10,8 +10,8 @@ WorldObject::WorldObject(LocalCollector& collector) {
     AddValue("true", new BooleanObject(true));
     AddValue("false", new BooleanObject(false));
 
-    //AddValue("os", new OSObject(collector));
-    //AddValue("system", new SystemObject(collector));
+    AddValue("os", new OSObject(collector));
+    AddValue("system", new SystemObject(collector));
 
     NilObject::nil = new NilObject();
     AddValue("nil", NilObject::nil);

@@ -23,3 +23,23 @@ OrobaObject* OrobaObject::MessageNotFound(string name, vector<OrobaObject*> args
 void OrobaObject::Trace() {
     tagged = true;
 }
+
+Method::Method() : method(nullptr) { } 
+Method::Method(SlotMethod slot_method) : method(slot_method) { }
+Method::Method(UserMethod user_method) : method(user_method) { }
+Method::Method(PrimitiveMethod* prim_method) : method(prim_method) { }
+
+void Method::Trace() {
+    if (tagged) return;
+    tagged = true;
+    if (holds_alternative<PrimitiveMethod*>(method)) {
+        PrimitiveMethod* prim = get<PrimitiveMethod*>(method);
+        prim->tagged = true;
+    }
+}
+
+void Method::AddToCollector(LocalCollector& collector) {
+    if (holds_alternative<PrimitiveMethod*>(method)) {
+        collector.Add(get<PrimitiveMethod*>(method));
+    }
+}

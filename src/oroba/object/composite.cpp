@@ -91,12 +91,3 @@ void CompositeObject::Trace() {
     }
 }
 
-
-Method::Method() : method(nullptr) { } 
-Method::Method(SlotMethod slot_method) : method(slot_method) { }
-Method::Method(UserMethod user_method) : method(user_method) { }
-Method::Method(PrimitiveMethod* prim_method) : method(prim_method) { }
-
-void Method::Trace() { }
-
-void Method::AddToCollector(LocalCollector& collector) { }

@@ -33,7 +33,7 @@ public:
 
     virtual OrobaObject* Invoke(std::vector<OrobaObject*> args, LocalCollector& collector) override {
         if (args.size() == sizeof...(Args)) {
-            auto args_tuple = convert_to_tuple<Args...>(args);
+            auto args_tuple = convert_to_tuple<0, Args...>(args);
             return std::apply(m_method, std::tuple_cat(args_tuple, std::tuple<LocalCollector&>(collector)));
         } else {
             std::ostringstream oss;
@@ -41,8 +41,6 @@ public:
             throw InternalError(oss.str());
         }
     }
-
-    virtual void Trace() override {}; 
 
 private:
     std::string m_name;
