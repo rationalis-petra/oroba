@@ -32,11 +32,12 @@ OrobaObject* OStreamObject::SendMessage(bool internal, string name, vector<Oroba
         } else {
             throw OrobaError("Object did not convert to string; threfore cannot write to ostream.");
         }
-    } else if (name == "to-string" && args.size() == 0) {
-        OrobaObject* out = new StringObject("*standard output port*");
-        collector.Add(out);
-        return out;
     } else {
         return OrobaObject::SendMessage(internal, name, args, collector);
     }
+}
+
+
+string OStreamObject::Representation() {
+    return "<output stream primitive>";
 }

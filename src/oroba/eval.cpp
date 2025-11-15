@@ -51,6 +51,15 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             stack.pop_back();
             break;
         }
+        case OpCodeType::Swap: {
+            OrobaObject* ob1 = stack.back();
+            stack.pop_back();
+            OrobaObject* ob2 = stack.back();
+            stack.pop_back();
+            stack.push_back(ob1);
+            stack.push_back(ob2);
+            break;
+        }
         case OpCodeType::MakeBlock: {
             throw InternalError("not implemented: eval make block");
             break;

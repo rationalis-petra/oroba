@@ -9,6 +9,11 @@
 
 using namespace std;
 
+/* Grammar:
+ * Statement 
+ * 
+ */
+
 optional<ParseError> parse_statement(istream& in, int terminator,  Bytecode& out,LocalCollector& collector);
 optional<ParseError> parse_expr(istream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_object(istream& in, Bytecode& out, LocalCollector& collector);
@@ -25,6 +30,7 @@ optional<ParseError> parse_symbol(istream& in, string symbol);
 
 ParseError error(string message);
 void consume_whitespace(istream& in);
+bool is_operator(string str);
 bool is_whitespace(int c);
 bool is_specialchar(int c);
 
@@ -49,6 +55,9 @@ optional<ParseError> parse_statement(istream& in, int terminator, Bytecode& out,
         } else if (c == '.' || c == ',') {
             in.get();
             return std::nullopt;
+        // } else if (c == ',') {
+            // A comma here, where we are NOT in a message part, indicates 
+            // return std::nullopt;
         } else if (c == '(') {
             return error("not parsing groupings yet");
         } else if (c == '{') {
@@ -259,6 +268,17 @@ optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, 
         } else {
             out.ops.push_back(OpCode::impl_message(messagename.str(), num_exprs));
         }
+    } else if (is_operator(message)) {
+        // TODO: rework precedence and order of operations correctly.
+        // - Pass value on stack 
+        out.ops.push_back(OpCode::impl_message(message, 0));
+        out.ops.push_back(OpCode::swap());
+        uint64_t num_exprs = 0;
+        optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
+        if (res.has_value()) return res;
+
+        out.ops.push_back(OpCode::expl_message("_invoke:", num_exprs + 1));
+        return nullopt;
     } else {
         // no argument
         if (has_target) {
@@ -436,6 +456,24 @@ void consume_whitespace(istream& in) {
     while (is_whitespace(in.peek())) {
         in.get();
     }
+}
+
+bool is_operator(string s) {
+    bool is_operator = true;
+    for (char c : s) {
+        is_operator &= (  (c == '=')
+                        | (c == '+')
+                        | (c == '-')
+                        | (c == '*')
+                        | (c == '/')
+                        | (c == '<')
+                        | (c == '>') 
+                        | (c == '$') 
+                        | (c == '%') 
+                        | (c == '|') 
+                        | (c == '&'));
+    }
+    return is_operator;
 }
 
 bool is_whitespace(int c) {

@@ -5,6 +5,8 @@
 #include "oroba/world/math.hpp"
 #include "oroba/world/os.hpp"
 
+#include "oroba/world/lobby.hpp"
+
 using namespace std;
 
 WorldObject::WorldObject(LocalCollector& collector) {
@@ -18,5 +20,11 @@ WorldObject::WorldObject(LocalCollector& collector) {
     NilObject::nil = new NilObject();
     AddValue("nil", NilObject::nil);
 
+    AddValue("lobby", new LobbyObject(slots["math"].object, this, collector));
+
     PostAssignmentSetup(collector);
+}
+
+std::string WorldObject::Representation() {
+    return "world";
 }

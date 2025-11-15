@@ -8,6 +8,7 @@ class OStreamObject : public OrobaObject {
 public:
     OStreamObject(std::ostream& ostream);
     virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
+    virtual std::string Representation();
 
     std::ostream& ostream;
 };

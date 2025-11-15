@@ -40,6 +40,12 @@ OpCode OpCode::pop() {
     return out;
 }
 
+OpCode OpCode::swap() {
+    OpCode out(nullptr);
+    out.type = OpCodeType::Swap;
+    return out;
+}
+
 OpCode OpCode::make_object(unordered_map<string, SlotDescriptor> slots,
                            unordered_map<string, MethodDescriptor> methods,
                            vector<string> to_initialize) {

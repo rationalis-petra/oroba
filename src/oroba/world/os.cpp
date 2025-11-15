@@ -11,3 +11,7 @@ OSObject::OSObject(LocalCollector& collector) {
 
     PostAssignmentSetup(collector);
 }
+
+std::string OSObject::Representation() {
+    return "os";
+}

@@ -52,7 +52,7 @@ int main (int argc, char** argv) {
     main_collector.AddRoot(world);
     main_collector.Add(world);
     try {
-        while (repl_iter(cin, cout, world, main_collector));
+        while (repl_iter(cin, cout, world->slots["lobby"].object, main_collector));
     } catch (InternalError& err) {
         cout << "Threw error indication exceptional circumstance:\n" << err.message << "\n";
         cout.flush();

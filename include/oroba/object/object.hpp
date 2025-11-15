@@ -49,6 +49,9 @@ public:
     virtual std::optional<std::pair<CompositeObject*, Method>> MethodLookup(std::string name);
     OrobaObject* MessageNotFound(std::string name, std::vector<OrobaObject*> args, LocalCollector& collector);
 
+    // Messages supported by all objects:
+    virtual std::string Representation() = 0;
+
     // Tracer interface
     virtual void Trace() override; 
 };

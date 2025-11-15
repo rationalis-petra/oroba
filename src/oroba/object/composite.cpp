@@ -91,3 +91,7 @@ void CompositeObject::Trace() {
     }
 }
 
+std::string CompositeObject::Representation() {
+    return "use object";
+}
+

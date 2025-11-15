@@ -26,6 +26,7 @@ class CompositeObject : public OrobaObject {
 public:
     virtual OrobaObject* SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) override;
     virtual std::optional<std::pair<CompositeObject*, Method>> MethodLookup(std::string name) override;
+    virtual std::string Representation() override; 
 
     // Tracer interface
     virtual void Trace() override; 

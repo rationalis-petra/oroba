@@ -8,8 +8,8 @@
 using namespace std;
 
 MathObject::MathObject(LocalCollector& collector) {
-    AddValue("add", new PrimFunction<IntegerObject*, IntegerObject*>(
-      "add",
+    AddValue("+", new PrimFunction<IntegerObject*, IntegerObject*>(
+      "+",
       [](IntegerObject* lhs, IntegerObject* rhs, LocalCollector& collector) -> OrobaObject* {
           IntegerObject* out = new IntegerObject(lhs->val + rhs->val);
           collector.Add(out);
@@ -81,4 +81,8 @@ MathObject::MathObject(LocalCollector& collector) {
     );
 
     PostAssignmentSetup(collector);
+}
+
+std::string MathObject::Representation() {
+    return "math";
 }

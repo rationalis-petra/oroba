@@ -39,6 +39,8 @@ enum class OpCodeType {
     ExplMessage,
     Push, 
     Pop,
+    Swap,
+
     MakeBlock,
     MakeObject,
 };
@@ -83,6 +85,7 @@ struct OpCode {
 
     static OpCode push(OrobaObject* literal);
     static OpCode pop();
+    static OpCode swap();
     static OpCode make_object(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::unordered_map<std::string, MethodDescriptor> methods,
                               std::vector<std::string> to_initialize);

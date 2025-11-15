@@ -20,3 +20,7 @@ SystemObject::SystemObject(LocalCollector& collector) {
 
     PostAssignmentSetup(collector);
 }
+
+std::string SystemObject::Representation() {
+    return "system";
+}

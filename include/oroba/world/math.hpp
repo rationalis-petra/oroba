@@ -6,6 +6,7 @@
 class MathObject : public NamespaceObject {
 public:
     MathObject(LocalCollector& collector);
+    virtual std::string Representation() override;
 };
 
 #endif

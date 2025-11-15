@@ -6,6 +6,7 @@
 class WorldObject : public NamespaceObject {
 public:
     WorldObject(LocalCollector& collector);
+    virtual std::string Representation() override;
 };
 
 #endif

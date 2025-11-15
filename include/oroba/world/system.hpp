@@ -6,6 +6,7 @@
 class SystemObject : public NamespaceObject {
 public:
     SystemObject(LocalCollector& collector);
+    virtual std::string Representation() override;
 };
 
 #endif

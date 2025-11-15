@@ -37,6 +37,10 @@ public:
         }
     }
 
+    virtual std::string Representation() override {
+        return m_name;
+    }
+
 private:
     std::string m_name;
     std::function<OrobaObject*(Args... args, LocalCollector& collector)> m_method;

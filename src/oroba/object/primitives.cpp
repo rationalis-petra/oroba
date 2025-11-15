@@ -7,19 +7,12 @@
 using namespace std;
 
 OrobaObject* PrimitiveObject::SendMessage(bool internal, string name, vector<OrobaObject*> args, LocalCollector& collector) {
-    if (name == "to-string") {
-        // TODO - check for correct number of args. 
-        OrobaObject* stringobj = new StringObject(ToString());
-        collector.Add(stringobj);
-        return stringobj;
-    } else {
-        return OrobaObject::SendMessage(internal, name, args, collector);
-    }
+    return OrobaObject::SendMessage(internal, name, args, collector);
 }
 
 NilObject* NilObject::nil = nullptr;
 
-string NilObject::ToString() { return "nil"; }
+string NilObject::Representation() { return "nil"; }
 
 BooleanObject::BooleanObject(bool source) : val(source) {}
 
@@ -36,7 +29,7 @@ OrobaObject* BooleanObject::SendMessage(bool internal, string name, vector<Oroba
     return PrimitiveObject::SendMessage(internal, name, args, collector);
 }
 
-string BooleanObject::ToString() {
+string BooleanObject::Representation() {
     return val ? "true" : "false";
 }
 
@@ -44,7 +37,7 @@ string BooleanObject::ToString() {
 IntegerObject::IntegerObject(int64_t source) : val(source) {
 }
 
-string IntegerObject::ToString() {
+string IntegerObject::Representation() {
     ostringstream oss;
     oss << val;
     return oss.str();

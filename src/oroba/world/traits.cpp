@@ -15,3 +15,7 @@ TraitsObject::TraitsObject(LocalCollector& collector) {
     //methods["block"] = block_trait(collector);
 
 }
+
+std::string TraitsObject::Representation() {
+    return "traits";
+}
