@@ -61,7 +61,42 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             break;
         }
         case OpCodeType::MakeBlock: {
-            throw InternalError("not implemented: eval make block");
+            MakeBlock mb = get<MakeBlock>(op.payload);
+            CompositeObject* obj = new CompositeObject;
+            // for (auto sldesc : mo.slots) {
+            //     SlotDescriptor desc = sldesc.second;
+            //     string name = sldesc.first;
+            //     Slot slot;
+            //     if (desc.) {
+            //         slot.parent_priority = desc.parent_priority;
+            //         slot.object = NilObject::nil;
+            //         obj->slots[name] = slot;
+
+            //         // Slot methods
+            //         SlotMethod m{false, name};
+            //         obj->methods[name] = Method(m);
+
+            //         if (desc.can_write) {
+            //             string settername = name + ":";
+            //             SlotMethod m{true, name};
+            //             obj->methods[settername] = Method(m);
+            //         }
+            //     }
+            // }
+            // for (auto to_init : mo.to_initialize) {
+            //     obj->slots[to_init].object = stack.back();
+            //     stack.pop_back();
+            // }
+            UserMethod method;
+            method.args = mb.args;
+            method.body = *mb.body;
+            if (mb.args.size() == 0) {
+                obj->methods["invoke"] = Method(method);
+            } else {
+                obj->methods["invoke:"] = Method(method);
+            }
+            collector.Add(obj);
+            stack.push_back(obj);
             break;
         }
         case OpCodeType::MakeObject: {

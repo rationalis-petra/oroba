@@ -28,8 +28,13 @@ public:
     virtual std::optional<std::pair<CompositeObject*, Method>> MethodLookup(std::string name) override;
     virtual std::string Representation() override; 
 
+    // Utility
+    void AddMethod(std::string name, Method method);
+    void AddValue(std::string name, OrobaObject* value);
+
     // Tracer interface
     virtual void Trace() override; 
+
 
     std::unordered_map<std::string, Slot> slots;
     std::unordered_map<std::string, Method> methods;

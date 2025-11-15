@@ -3,9 +3,9 @@
 
 #include "oroba/object/namespace.hpp"
 
-class LobbyObject : public NamespaceObject {
+class LobbyNs : public NamespaceObject {
 public:
-    LobbyObject(OrobaObject* math, OrobaObject* world, LocalCollector& collector);
+    LobbyNs(OrobaObject* math, OrobaObject* world, LocalCollector& collector);
     virtual std::string Representation() override;
 };
 

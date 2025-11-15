@@ -7,13 +7,13 @@
 
 using namespace std;
 
-LobbyObject::LobbyObject(OrobaObject* math, OrobaObject* world, LocalCollector& collector) {
+LobbyNs::LobbyNs(OrobaObject* math, OrobaObject* world, LocalCollector& collector) {
     Slot s = Slot {.parent_priority = 1, math};
     slots["math"] = s;
     s = Slot {.parent_priority = 1, world};
     slots["world"] = s;
 }
 
-std::string LobbyObject::Representation() {
-    return "lobby";
+std::string LobbyNs::Representation() {
+    return "world lobby";
 }

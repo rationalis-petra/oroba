@@ -78,6 +78,21 @@ OrobaObject* CompositeObject::SendMessage(bool internal, std::string name, std::
 
     return OrobaObject::SendMessage(internal, name, args, collector);
 }
+void CompositeObject::AddMethod(std::string name, Method method) {
+    methods[name] = method;
+} 
+
+void CompositeObject::AddValue(std::string name, OrobaObject* value) {
+    Slot slot{};
+    slot.parent_priority = 0;
+    slot.object = value;
+    slots[name] = slot;
+
+    SlotMethod m{false, name};
+    methods[name] = Method(m);
+    // add getter method;
+}
+
 
 void CompositeObject::Trace() {
     if (tagged) return;
@@ -90,6 +105,7 @@ void CompositeObject::Trace() {
         method.second.Trace();
     }
 }
+
 
 std::string CompositeObject::Representation() {
     return "use object";

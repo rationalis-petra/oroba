@@ -20,7 +20,7 @@ WorldObject::WorldObject(LocalCollector& collector) {
     NilObject::nil = new NilObject();
     AddValue("nil", NilObject::nil);
 
-    AddValue("lobby", new LobbyObject(slots["math"].object, this, collector));
+    AddValue("lobby", new LobbyNs(slots["math"].object, this, collector));
 
     PostAssignmentSetup(collector);
 }

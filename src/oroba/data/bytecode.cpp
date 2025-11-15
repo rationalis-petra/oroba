@@ -12,11 +12,13 @@ MessageOp::MessageOp(string _name, uint16_t _num_operands)
 
 
 MakeBlock::MakeBlock(unordered_map<string, SlotDescriptor> _slots,
-          vector<string> _to_initialize,
-          shared_ptr<Bytecode> _code)
+                     vector<string> _to_initialize,
+                     std::vector<string> _args,
+                     shared_ptr<Bytecode> _body)
     : slots(_slots)
     , to_initialize(_to_initialize)
-    , code(_code) { }
+    , args(_args)
+    , body(_body) { }
 
 MakeObject::MakeObject(unordered_map<string, SlotDescriptor> _slots,
                        unordered_map<string, MethodDescriptor> _methods,
@@ -54,10 +56,11 @@ OpCode OpCode::make_object(unordered_map<string, SlotDescriptor> slots,
     return out;
 }
 
-OpCode OpCode::make_block(std::unordered_map<std::string, SlotDescriptor> slots,
-                         std::vector<std::string> to_initialize,
-                         std::shared_ptr<Bytecode> code) {
-    OpCode out(MakeBlock(slots, to_initialize, code));
+OpCode OpCode::make_block(unordered_map<string, SlotDescriptor> slots,
+                          vector<string> to_initialize,
+                          vector<string> args,
+                          shared_ptr<Bytecode> body) {
+    OpCode out(MakeBlock(slots, to_initialize, args, body));
     out.type = OpCodeType::MakeBlock;
     return out;
 }

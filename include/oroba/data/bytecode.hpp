@@ -58,11 +58,13 @@ struct MakeBlock {
 public:
     MakeBlock(std::unordered_map<std::string, SlotDescriptor> slots,
               std::vector<std::string> to_initialize,
+              std::vector<std::string> args,
               std::shared_ptr<Bytecode> code);
 
     std::unordered_map<std::string, SlotDescriptor> slots;
     std::vector<std::string> to_initialize;
-    std::shared_ptr<Bytecode> code;
+    std::vector<std::string> args;
+    std::shared_ptr<Bytecode> body;
 };
 
 struct MethodDescriptor {
@@ -91,6 +93,7 @@ struct OpCode {
                               std::vector<std::string> to_initialize);
     static OpCode make_block(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::vector<std::string> to_initialize,
+                              std::vector<std::string> args,
                               std::shared_ptr<Bytecode> code);
     static OpCode impl_message(std::string messagename, uint16_t num_operands);
     static OpCode expl_message(std::string messagename, uint16_t num_operands);

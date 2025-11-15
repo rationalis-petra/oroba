@@ -3,10 +3,12 @@
 
 #include "oroba/object/namespace.hpp"
 
-class TraitsObject : public NamespaceObject {
+class TraitsNs : public NamespaceObject {
 public:
-    TraitsObject(LocalCollector& collector);
+    TraitsNs(LocalCollector& collector);
     virtual std::string Representation() override;
+
+    static OrobaObject* bool_trait;
 };
 
 #endif

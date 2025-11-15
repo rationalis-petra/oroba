@@ -143,48 +143,57 @@ optional<ParseError> parse_object(istream& in, Bytecode& out, LocalCollector& co
     return std::nullopt;
 }
 
+// Block parsing: 
+// [ body ]
+// [ :arg1 arg2... | body ]
+// [ :arg1 arg2... | slot <- val. | body ]
 optional<ParseError> parse_block(istream& in, Bytecode& out, LocalCollector& collector) {
     shared_ptr<Bytecode> object_bytecode(new Bytecode);
     unordered_map<string, SlotDescriptor> slots;
     vector<string> to_initialize;
     vector<string> arg_slots;
 
+
     // consume '['
     in.get();
     consume_whitespace(in);
+
     int c = in.peek();
+    // Step 1: parse arguments
+
+    // TODO: add in slot descriptor parsing
     // slot descriptors.
-    if (c == '|') {
-        in.get();
-        bool parsing_slots = true;
-        while (parsing_slots) {
-            // slot descriptors are either as 
-            //   slot-name = <statement>.
-            //    or 
-            //   slot-value <- statement.
-            auto slot_res = parse_slot(in);
-            if (holds_alternative<ParseError>(slot_res)) return get<ParseError>(slot_res);
-            SlotDescriptor slot_desc = get<1>(get<pair<string, SlotDescriptor>>(slot_res));
-            string slot_name = get<0>(get<pair<string, SlotDescriptor>>(slot_res));
-            if (slot_desc.is_initialized) {
-                to_initialize.push_back(slot_name);
-            }
+    // if (c == '|') {
+    //     in.get();
+    //     bool parsing_slots = true;
+    //     while (parsing_slots) {
+    //         // slot descriptors are either as 
+    //         //   slot-name = <statement>.
+    //         //    or 
+    //         //   slot-value <- statement.
+    //         auto slot_res = parse_slot(in);
+    //         if (holds_alternative<ParseError>(slot_res)) return get<ParseError>(slot_res);
+    //         SlotDescriptor slot_desc = get<1>(get<pair<string, SlotDescriptor>>(slot_res));
+    //         string slot_name = get<0>(get<pair<string, SlotDescriptor>>(slot_res));
+    //         if (slot_desc.is_initialized) {
+    //             to_initialize.push_back(slot_name);
+    //         }
 
-            slots[slot_name] = slot_desc;
-            if (slot_desc.is_initialized) {
-                auto result = parse_statement(in, '|', out, collector);
-                if (result.has_value()) return result;
-            } 
+    //         slots[slot_name] = slot_desc;
+    //         if (slot_desc.is_initialized) {
+    //             auto result = parse_statement(in, '|', out, collector);
+    //             if (result.has_value()) return result;
+    //         } 
 
-            consume_whitespace(in);
-            c = in.peek();
-            if (c == '|') {
-                parsing_slots = false;
-            }
-        }
-        // consume closing '|'
-        in.get();
-    }
+    //         consume_whitespace(in);
+    //         c = in.peek();
+    //         if (c == '|') {
+    //             parsing_slots = false;
+    //         }
+    //     }
+    //     // consume closing '|'
+    //     in.get();
+    // }
 
     c = in.peek();
     bool run = false;
@@ -197,7 +206,7 @@ optional<ParseError> parse_block(istream& in, Bytecode& out, LocalCollector& col
     }
     in.get();
 
-    out.ops.push_back(OpCode::make_block(slots, to_initialize, object_bytecode));
+    out.ops.push_back(OpCode::make_block(slots, to_initialize, arg_slots, object_bytecode));
     return std::nullopt;
 }
 
@@ -211,13 +220,15 @@ optional<ParseError> parse_expr(istream& in, uint64_t& num_exprs, Bytecode& out,
         can_continue = false;
 
         if (c == '.') {
-            return error("unexpected end of statement in exprssion.");
+            return error("unexpected end of statement in expression.");
         } else if (c == '(')
             return error("not parsing groupings yet");
         else if (c == '{')
             return error("not parsing objects yet");
-        else if (c == '[')
-            return error("not parsing blocks yet");
+        else if (c == '[') {
+            auto result = parse_block(in, out, collector);
+            if (result.has_value()) return result;
+        }
         else if (isdigit(c)) {
             optional<ParseError> res = parse_number(in, out, collector);
             if (res.has_value()) return res;
@@ -259,6 +270,7 @@ optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, 
     }
     string message = messagename.str();
     if (message.back() == ':') {
+        // May be multipart message
         uint64_t num_exprs = 0;
         optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
         if (res.has_value()) return res;

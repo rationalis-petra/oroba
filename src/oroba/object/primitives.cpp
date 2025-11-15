@@ -20,9 +20,9 @@ OrobaObject* BooleanObject::SendMessage(bool internal, string name, vector<Oroba
     // TODO: check for 2 args!
     if (name == "ifTrue:ifFalse:") {
         if (val) {
-            return args[0]->SendMessage(false, "call", vector<OrobaObject*>{}, collector);
+            return args[0]->SendMessage(false, "invoke", vector<OrobaObject*>{}, collector);
         } else {
-            return args[1]->SendMessage(false, "call", vector<OrobaObject*>{}, collector);
+            return args[1]->SendMessage(false, "invoke", vector<OrobaObject*>{}, collector);
         }
     } 
 
