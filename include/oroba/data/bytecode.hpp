@@ -70,8 +70,8 @@ struct MethodDescriptor {
 
 struct MakeObject {
     MakeObject(std::unordered_map<std::string, SlotDescriptor> slots,
-               std::vector<std::string> to_initialize,
-               std::unordered_map<std::string, MethodDescriptor> methods);
+               std::unordered_map<std::string, MethodDescriptor> methods,
+               std::vector<std::string> to_initialize);
 
     std::unordered_map<std::string, SlotDescriptor> slots;
     std::unordered_map<std::string, MethodDescriptor> methods;
@@ -84,8 +84,8 @@ struct OpCode {
     static OpCode push(OrobaObject* literal);
     static OpCode pop();
     static OpCode make_object(std::unordered_map<std::string, SlotDescriptor> slots,
-                              std::vector<std::string> to_initialize,
-                              std::unordered_map<std::string, MethodDescriptor> methods);
+                              std::unordered_map<std::string, MethodDescriptor> methods,
+                              std::vector<std::string> to_initialize);
     static OpCode make_block(std::unordered_map<std::string, SlotDescriptor> slots,
                               std::vector<std::string> to_initialize,
                               std::shared_ptr<Bytecode> code);

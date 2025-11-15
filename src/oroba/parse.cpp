@@ -130,7 +130,7 @@ optional<ParseError> parse_object(istream& in, Bytecode& out, LocalCollector& co
     }
     in.get();
 
-    out.ops.push_back(OpCode::make_object(slots, to_initialize, methods));
+    out.ops.push_back(OpCode::make_object(slots, methods, to_initialize));
     return std::nullopt;
 }
 

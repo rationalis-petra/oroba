@@ -19,11 +19,11 @@ MakeBlock::MakeBlock(unordered_map<string, SlotDescriptor> _slots,
     , code(_code) { }
 
 MakeObject::MakeObject(unordered_map<string, SlotDescriptor> _slots,
-                       vector<string> _to_initialize,
-                       unordered_map<string, MethodDescriptor> _methods)
+                       unordered_map<string, MethodDescriptor> _methods,
+                       vector<string> _to_initialize)
     : slots(_slots)
-    , to_initialize(_to_initialize)
-    , methods(_methods) { }
+    , methods(_methods)
+    , to_initialize(_to_initialize) { }
 
 OpCode::~OpCode() {
 }
@@ -41,9 +41,9 @@ OpCode OpCode::pop() {
 }
 
 OpCode OpCode::make_object(unordered_map<string, SlotDescriptor> slots,
-                           vector<string> to_initialize,
-                           unordered_map<string, MethodDescriptor> methods) {
-    OpCode out(MakeObject(slots, to_initialize, methods));
+                           unordered_map<string, MethodDescriptor> methods,
+                           vector<string> to_initialize) {
+    OpCode out(MakeObject(slots, methods, to_initialize));
     out.type = OpCodeType::MakeObject;
     return out;
 }
