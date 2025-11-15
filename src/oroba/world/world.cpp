@@ -2,6 +2,7 @@
 
 #include "oroba/object/primitives.hpp"
 #include "oroba/world/system.hpp"
+#include "oroba/world/math.hpp"
 #include "oroba/world/os.hpp"
 
 using namespace std;
@@ -12,6 +13,7 @@ WorldObject::WorldObject(LocalCollector& collector) {
 
     AddValue("os", new OSObject(collector));
     AddValue("system", new SystemObject(collector));
+    AddValue("math", new MathObject(collector));
 
     NilObject::nil = new NilObject();
     AddValue("nil", NilObject::nil);

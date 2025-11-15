@@ -51,7 +51,9 @@ What is an object?
       - The body is evaluated as a series of messages sent to the method
         activation object.
 
-Multimethods:        
+Functions & Genrics:
+  - Support method - call:
+  - 
 
 * Syntax:
 

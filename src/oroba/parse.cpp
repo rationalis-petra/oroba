@@ -10,7 +10,7 @@
 using namespace std;
 
 optional<ParseError> parse_statement(istream& in, int terminator,  Bytecode& out,LocalCollector& collector);
-optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector);
+optional<ParseError> parse_expr(istream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_object(istream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_block(istream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector);
@@ -46,7 +46,7 @@ optional<ParseError> parse_statement(istream& in, int terminator, Bytecode& out,
 
         else if (c == terminator) {
             return std::nullopt;
-        } else if (c == '.') {
+        } else if (c == '.' || c == ',') {
             in.get();
             return std::nullopt;
         } else if (c == '(') {
@@ -192,35 +192,52 @@ optional<ParseError> parse_block(istream& in, Bytecode& out, LocalCollector& col
     return std::nullopt;
 }
 
-optional<ParseError> parse_expr(istream& in, Bytecode& out, LocalCollector& collector) {
+optional<ParseError> parse_expr(istream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector) {
+    bool can_continue = true;
     consume_whitespace(in);
-    int c = in.peek();
-    if (c == EOF) return error("error - end of file!");
+    while (can_continue) {
+        int c = in.peek();
+        if (c == EOF) return error("error - end of file!");
+        num_exprs++;
+        can_continue = false;
 
-    if (c == '.') {
-        return error("unexpected end of statement in exprssion.");
+        if (c == '.') {
+            return error("unexpected end of statement in exprssion.");
+        } else if (c == '(')
+            return error("not parsing groupings yet");
+        else if (c == '{')
+            return error("not parsing objects yet");
+        else if (c == '[')
+            return error("not parsing blocks yet");
+        else if (isdigit(c)) {
+            optional<ParseError> res = parse_number(in, out, collector);
+            if (res.has_value()) return res;
+        }
+        else if (c == '"') {
+            auto res = parse_string(in, out, collector);
+            if (res.has_value()) return res;
+        }
+        else if (is_specialchar(c)) {
+            ostringstream oss;
+            oss << "unexpected special char: " << (char)c;
+            return error(oss.str());
+        }
+        else {
+            // continue to parse message...
+            return error("not parsing message within message yet...");
+            //auto result = parse_message(false, in, out, collector);
+            //if (result.has_value()) return result;
+        }
+
+        consume_whitespace(in);
+        c = in.peek();
+        if (c == ',') {
+            can_continue = true;
+            in.get();
+            consume_whitespace(in);
+        } 
     }
-    else if (c == '(')
-        return error("not parsing groupings yet");
-    else if (c == '{')
-        return error("not parsing objects yet");
-    else if (c == '[')
-        return error("not parsing blocks yet");
-    else if (isdigit(c)) {
-        return parse_number(in, out, collector);
-    }
-    else if (c == '"') {
-        return parse_string(in, out, collector);
-    }
-    else if (is_specialchar(c)) {
-        return error("unexpected special char");
-    }
-    else {
-        // continue to parse message...
-        return error("not parsing message within message yet...");
-        //auto result = parse_message(false, in, out, collector);
-        //if (result.has_value()) return result;
-    }
+    return nullopt;
 }
 
 optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, LocalCollector& collector) {
@@ -233,11 +250,14 @@ optional<ParseError> parse_message(bool has_target, istream& in, Bytecode& out, 
     }
     string message = messagename.str();
     if (message.back() == ':') {
-        parse_expr(in, out, collector);
+        uint64_t num_exprs = 0;
+        optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
+        if (res.has_value()) return res;
+
         if (has_target) {
-            out.ops.push_back(OpCode::expl_message(messagename.str(), 1));
+            out.ops.push_back(OpCode::expl_message(messagename.str(), num_exprs));
         } else {
-            out.ops.push_back(OpCode::impl_message(messagename.str(), 1));
+            out.ops.push_back(OpCode::impl_message(messagename.str(), num_exprs));
         }
     } else {
         // no argument
@@ -434,5 +454,6 @@ bool is_specialchar(int c) {
         || c == '}'
         || c == '|'
         || c == '.'
+        || c == ','
         || c == '"';
 }
