@@ -101,6 +101,8 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             s.parent_priority = 1;
             s.object = activation_objects.back();
             obj->slots["lexicalParent"] = s;
+
+            // Finally, push the obejct onto the stack.
             collector.Add(obj);
             stack.push_back(obj);
             break;
