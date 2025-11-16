@@ -1,5 +1,5 @@
-#ifndef __OROBA_PARSE_HPP
-#define __OROBA_PARSE_HPP
+#ifndef __OROBA_PARSE_PARSE_HPP
+#define __OROBA_PARSE_PARSE_HPP
 
 #include <istream>
 #include <variant>

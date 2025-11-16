@@ -4,7 +4,7 @@
 
 #include "oroba/data/error.hpp"
 
-#include "oroba/parse.hpp"
+#include "oroba/parse/parse.hpp"
 #include "oroba/eval.hpp"
 #include "oroba/object/collections.hpp"
 #include "oroba/world/world.hpp"
