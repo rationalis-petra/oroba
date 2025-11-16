@@ -43,6 +43,9 @@ void TokStream::UpdateCache() {
     consume_whitespace(m_istream);
     int c = m_istream.peek();
     switch (c) {
+    case EOF:
+        m_cached.type = TokenType::EndOfStream;
+        break;
     case '.': 
         m_istream.get();
         m_cached.type = TokenType::Separator;

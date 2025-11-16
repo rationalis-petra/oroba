@@ -269,9 +269,14 @@ optional<ParseError> parse_expr(TokStream& in, uint64_t& num_exprs, Bytecode& ou
             out.ops.push_back(OpCode::push(lit));
             return std::nullopt;
         }
-        case TokenType::Symbol:
-            //return parse_pessage(has_run, in, out, collector);
-            return error("not parsing message within message yet...");
+        case TokenType::Symbol: {
+            string sym = get<string>(tok.val);
+            if (sym.back() == ':') {
+                return std::nullopt;
+            } else {
+                return error("not parsing message within message yet...");
+            };
+        }
         default:
             in.get();
             return error("error - unexpected special character: ");
@@ -297,12 +302,23 @@ optional<ParseError> parse_message(bool has_target, TokStream& in, Bytecode& out
 
     if (message.back() == ':') {
         ostringstream messagename;
-        messagename << message;
-
-        // May be multipart message
         uint64_t num_exprs = 0;
-        optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
-        if (res.has_value()) return res;
+        bool continue_parse = true;
+        while (continue_parse) {
+            continue_parse = false;
+            messagename << message;
+
+            // May be multipart message
+            optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
+            if (res.has_value()) return res;
+
+            token = in.peek();
+            if (token.type == TokenType::Symbol) {
+                in.get();
+                message = get<string>(token.val);
+                continue_parse = message.back() == ':';
+            }
+        }
 
         if (has_target) {
             out.ops.push_back(OpCode::expl_message(messagename.str(), num_exprs));
