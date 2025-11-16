@@ -95,6 +95,12 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             } else {
                 obj->methods["invoke:"] = Method(method);
             }
+
+            // Add current (lexical) context as a parent slot.
+            Slot s;
+            s.parent_priority = 1;
+            s.object = activation_objects.back();
+            obj->slots["lexicalParent"] = s;
             collector.Add(obj);
             stack.push_back(obj);
             break;
