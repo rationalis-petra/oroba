@@ -7,10 +7,14 @@
 #include "oroba/object/ostream.hpp"
 #include "oroba/object/gui/window.hpp"
 
+#include "oroba/world/system/widgets.hpp"
+
 using namespace std;
 
-SystemObject::SystemObject(LocalCollector& collector)
+SystemNs::SystemNs(LocalCollector& collector)
     : app(Gtk::Application::create("org.oroba")) {
+    AddValue("widgets", new WidgetsNs(collector));
+
     AddValue("stdout", new OStreamObject(cout));
 
     AddMethod("exit", Method(new TypedPrimitiveMethod<OrobaObject*>(
@@ -50,6 +54,6 @@ SystemObject::SystemObject(LocalCollector& collector)
     PostAssignmentSetup(collector);
 }
 
-std::string SystemObject::Representation() {
+std::string SystemNs::Representation() {
     return "system";
 }

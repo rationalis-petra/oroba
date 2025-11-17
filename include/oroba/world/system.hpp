@@ -5,9 +5,9 @@
 
 #include "oroba/object/namespace.hpp"
 
-class SystemObject : public NamespaceObject {
+class SystemNs : public NamespaceObject {
 public:
-    SystemObject(LocalCollector& collector);
+    SystemNs(LocalCollector& collector);
     virtual std::string Representation() override;
 
     Glib::RefPtr<Gtk::Application> app;

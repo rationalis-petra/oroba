@@ -289,6 +289,7 @@ optional<ParseError> parse_message_arg(TokStream& in, uint64_t& num_exprs, Bytec
                     return error("not parsing message within multi-message yet...");
                 }
 
+                in.get();
                 if (has_target) {
                     out.ops.push_back(OpCode::expl_message(sym, 0));
                 } else {

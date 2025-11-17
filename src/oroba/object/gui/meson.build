@@ -1,1 +1,1 @@
-sources += files('window.cpp')
+sources += files(['window.cpp', 'textview.cpp'])

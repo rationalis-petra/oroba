@@ -15,7 +15,7 @@ WorldObject::WorldObject(LocalCollector& collector) {
     AddValue("true", new BooleanObject(true));
     AddValue("false", new BooleanObject(false));
 
-    AddValue("system", new SystemObject(collector));
+    AddValue("system", new SystemNs(collector));
     AddValue("math", new MathObject(collector));
 
     NilObject::nil = new NilObject();

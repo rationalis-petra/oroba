@@ -79,7 +79,7 @@ void TokStream::UpdateCache() {
         m_istream.get();
         m_cached.type = TokenType::ObjectEnd;
         break;
-    case '"': 
+    case '\'': 
         m_cached = parse_string(m_istream);
         break;
     case '#': 
@@ -123,13 +123,13 @@ Token parse_number(istream& in) {
 }
 
 Token parse_string(istream& in) {
-    // consume starting '"'
+    // consume starting '
     in.get();
     ostringstream oss;
-    while (in.peek() != '"') {
+    while (in.peek() != '\'') {
         oss << (char)in.get();
     }
-    // consume closing '"'
+    // consume closing '
     in.get();
 
     Token tok;
@@ -153,9 +153,21 @@ Token parse_symbol(istream& in) {
     return out;
 }
 
+
+void consume_comment(istream& in) {
+    in.get();
+    while (in.get() != '"') {}
+}
+
 void consume_whitespace(istream& in) {
-    while (is_whitespace(in.peek())) {
-        in.get();
+    int c = in.peek();
+    while (is_whitespace(c) || c == '"') {
+        if (c == '"') {
+            consume_comment(in);
+        } else {
+            in.get();
+        }
+        c = in.peek();
     }
 }
 
