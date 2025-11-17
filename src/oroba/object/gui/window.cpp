@@ -4,8 +4,8 @@
 #include "oroba/object/primitives.hpp"
 
 OrobaWindow::OrobaWindow() {
-    set_title("Basic application");
-    set_default_size(200, 200);
+    set_title("Oroba");
+    set_default_size(1280, 720);
 } 
 
 OrobaObject* OrobaWindow::SendMessage(bool internal, std::string name, std::vector<OrobaObject*> args, LocalCollector& collector) {
