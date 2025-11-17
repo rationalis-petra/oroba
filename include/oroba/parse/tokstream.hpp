@@ -26,6 +26,7 @@ enum class TokenType {
     Number,
     String,
     Symbol,
+    QSymbol,
 };
 
 struct Token {

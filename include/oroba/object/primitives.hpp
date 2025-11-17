@@ -50,4 +50,11 @@ public:
     double val;
 };
 
+class SymbolObject : public PrimitiveObject {
+public:
+    SymbolObject(std::string sym);
+    virtual std::string Representation() override;
+    std::string symbol;
+};
+
 #endif

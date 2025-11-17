@@ -6,6 +6,8 @@
 #include "oroba/object/primitives.hpp"
 #include "oroba/object/composite.hpp"
 
+#include "oroba/world/traits.hpp"
+
 using namespace std;
 
 OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) {
@@ -101,6 +103,10 @@ OrobaObject* eval(Bytecode& code, OrobaObject* init, LocalCollector& collector) 
             s.parent_priority = 1;
             s.object = activation_objects.back();
             obj->slots["lexicalParent"] = s;
+
+            s.parent_priority = 2;
+            s.object = TraitsNs::scope_trait;
+            obj->slots["parent"] = s;
 
             // Finally, push the obejct onto the stack.
             collector.Add(obj);

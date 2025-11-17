@@ -17,9 +17,10 @@ using namespace std;
  */
 
 optional<ParseError> parse_statement(TokStream& in, std::optional<TokenType> terminator,  Bytecode& out,LocalCollector& collector);
-optional<ParseError> parse_expr(TokStream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector);
+optional<ParseError> parse_message_arg(TokStream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_object(TokStream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_block(TokStream& in, Bytecode& out, LocalCollector& collector);
+optional<ParseError> parse_unimessage(bool has_target, TokStream& in, Bytecode& out, LocalCollector& collector);
 optional<ParseError> parse_message(bool has_target, TokStream& in, Bytecode& out, LocalCollector& collector);
 
 variant<ParseError, pair<string, SlotDescriptor>> parse_slot(TokStream& in);
@@ -85,6 +86,13 @@ optional<ParseError> parse_statement(TokStream& in, std::optional<TokenType> ter
         case TokenType::String: {
             in.get();
             OrobaObject* lit = new StringObject(get<string>(tok.val));
+            collector.Add(lit);
+            out.ops.push_back(OpCode::push(lit));
+            break;
+        }
+        case TokenType::QSymbol: {
+            in.get();
+            OrobaObject* lit = new SymbolObject(get<string>(tok.val));
             collector.Add(lit);
             out.ops.push_back(OpCode::push(lit));
             break;
@@ -224,13 +232,11 @@ optional<ParseError> parse_block(TokStream& in, Bytecode& out, LocalCollector& c
     return std::nullopt;
 }
 
-optional<ParseError> parse_expr(TokStream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector) {
-    bool can_continue = true;
-    while (can_continue) {
+optional<ParseError> parse_message_arg(TokStream& in, uint64_t& num_exprs, Bytecode& out, LocalCollector& collector) {
+    bool has_target = false;
+    num_exprs++;
+    while (true) {
         Token tok = in.peek();
-
-        num_exprs++;
-        can_continue = false;
 
         switch (tok.type) {
         case TokenType::Error:
@@ -240,11 +246,9 @@ optional<ParseError> parse_expr(TokStream& in, uint64_t& num_exprs, Bytecode& ou
             in.get();
             return error("error - end of file!");
         case TokenType::Separator:
-            return error("Unexpected end of statement in expression.");
-        case TokenType::Collector:
-            in.get();
             return std::nullopt;
-
+        case TokenType::Collector:
+            return error("unexpected , ");
         case TokenType::GroupBegin:
             return error("not parsing groupings yet");
         case TokenType::BlockBegin: {
@@ -269,27 +273,42 @@ optional<ParseError> parse_expr(TokStream& in, uint64_t& num_exprs, Bytecode& ou
             out.ops.push_back(OpCode::push(lit));
             return std::nullopt;
         }
+        case TokenType::QSymbol: {
+            in.get();
+            OrobaObject* lit = new SymbolObject(get<string>(tok.val));
+            collector.Add(lit);
+            out.ops.push_back(OpCode::push(lit));
+            break;
+        }
         case TokenType::Symbol: {
             string sym = get<string>(tok.val);
             if (sym.back() == ':') {
                 return std::nullopt;
             } else {
-                return error("not parsing message within message yet...");
+                if (is_operator(sym)) {
+                    return error("not parsing message within multi-message yet...");
+                }
+
+                if (has_target) {
+                    out.ops.push_back(OpCode::expl_message(sym, 0));
+                } else {
+                    out.ops.push_back(OpCode::impl_message(sym, 0));
+                }
             };
+            break;
         }
         default:
             in.get();
             return error("error - unexpected special character: ");
         }
 
+        has_target = true;
         tok = in.peek();
         if (tok.type == TokenType::Collector) {
-            can_continue = true;
             in.get();
+            has_target = false;
         } 
     }
-
-    return nullopt;
 }
 
 optional<ParseError> parse_message(bool has_target, TokStream& in, Bytecode& out, LocalCollector& collector) {
@@ -309,7 +328,7 @@ optional<ParseError> parse_message(bool has_target, TokStream& in, Bytecode& out
             messagename << message;
 
             // May be multipart message
-            optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
+            optional<ParseError> res = parse_message_arg(in, num_exprs, out, collector);
             if (res.has_value()) return res;
 
             token = in.peek();
@@ -331,7 +350,7 @@ optional<ParseError> parse_message(bool has_target, TokStream& in, Bytecode& out
         out.ops.push_back(OpCode::impl_message(message, 0));
         out.ops.push_back(OpCode::swap());
         uint64_t num_exprs = 0;
-        optional<ParseError> res = parse_expr(in, num_exprs, out, collector);
+        optional<ParseError> res = parse_message_arg(in, num_exprs, out, collector);
         if (res.has_value()) return res;
 
         out.ops.push_back(OpCode::expl_message("_invoke:", num_exprs + 1));

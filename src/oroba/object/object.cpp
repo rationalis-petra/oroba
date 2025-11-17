@@ -12,8 +12,9 @@ OrobaObject* OrobaObject::SendMessage(bool internal, std::string name, std::vect
         OrobaObject* out = new StringObject(Representation());
         collector.Add(out);
         return out;
+    } else {
+        return MessageNotFound(name, args, collector);
     }
-    return MessageNotFound(name, args, collector);
 }
 
 optional<pair<CompositeObject*, Method>> OrobaObject::MethodLookup(string name) {

@@ -8,6 +8,7 @@ public:
     TraitsNs(LocalCollector& collector);
     virtual std::string Representation() override;
 
+    static OrobaObject* scope_trait;
     static OrobaObject* bool_trait;
 };
 

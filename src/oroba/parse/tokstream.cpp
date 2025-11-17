@@ -19,6 +19,7 @@ Token::Token() {
 }
 
 TokStream::TokStream(std::istream& in) : m_istream(in) {
+    m_is_cached = false;
 }
 
 Token TokStream::peek() {
@@ -81,6 +82,11 @@ void TokStream::UpdateCache() {
     case '"': 
         m_cached = parse_string(m_istream);
         break;
+    case '#': 
+        m_istream.get();
+        m_cached = parse_symbol(m_istream);
+        m_cached.type = TokenType::QSymbol;
+        break;
     default:
         if (isdigit(c)) {
             m_cached = parse_number(m_istream);
@@ -123,6 +129,8 @@ Token parse_string(istream& in) {
     while (in.peek() != '"') {
         oss << (char)in.get();
     }
+    // consume closing '"'
+    in.get();
 
     Token tok;
     tok.type = TokenType::String;
@@ -168,5 +176,6 @@ bool is_specialchar(int c) {
         || c == '|'
         || c == '.'
         || c == ','
-        || c == '"';
+        || c == '"'
+        || c == '#';
 }

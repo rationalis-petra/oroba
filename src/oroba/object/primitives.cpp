@@ -43,3 +43,8 @@ string IntegerObject::Representation() {
     return oss.str();
 }
 
+SymbolObject::SymbolObject(string sym) : symbol (sym) { }
+
+string SymbolObject::Representation() {
+    return "#" + symbol;
+}

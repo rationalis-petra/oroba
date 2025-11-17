@@ -3,6 +3,7 @@
 #include "oroba/object/composite.hpp"
 
 #include <unordered_set>
+#include <map>
 
 using namespace std;
 
@@ -11,19 +12,27 @@ optional<pair<CompositeObject*, Method>> CompositeObject::MethodLookup(std::stri
     if (res != end(methods)) {
         return pair(this, res->second);
     } else {
-        optional<pair<CompositeObject*, Method>> method = nullopt;
+        map<int, vector<OrobaObject*>> priority_groups;
         for (auto slot : slots) {
-            // TODO: priority
             if (slot.second.parent_priority > 0) {
-                auto parent_method = slot.second.object->MethodLookup(name);
+                priority_groups[slot.second.parent_priority].push_back(slot.second.object);
+            }
+        }
+        
+        for (auto it = priority_groups.rbegin(); it != priority_groups.rend(); it++) {
+            optional<pair<CompositeObject*, Method>> method = nullopt;
+            for (auto parent : it->second) {
+                auto parent_method = parent->MethodLookup(name);
                 if (method.has_value() && parent_method.has_value()) {
                     throw OrobaError("Ambiguous method resolution");
                 } else if (!method.has_value()) {
                     method = parent_method;
                 }
             }
+            if (method.has_value()) return method;
         }
-        return method;
+
+        return nullopt;
     }
 }
 
@@ -48,7 +57,10 @@ OrobaObject* CompositeObject::SendMessage(bool internal, std::string name, std::
             }
         } else if (holds_alternative<PrimitiveMethod*>(method.method)) {
             PrimitiveMethod* prim = get<PrimitiveMethod*>(method.method);
-            prim->Invoke(args, collector);
+            vector<OrobaObject*> method_args;
+            method_args.push_back(this);
+            method_args.insert(method_args.end(), args.begin(), args.end());
+            return prim->Invoke(method_args, collector);
         } else {
             UserMethod user = get<UserMethod>(method.method);
             CompositeObject* activationObject = new CompositeObject;

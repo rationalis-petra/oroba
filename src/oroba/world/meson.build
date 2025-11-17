@@ -1,0 +1,6 @@
+sources += files('generics.cpp')
+sources += files('lobby.cpp')
+sources += files('math.cpp')
+sources += files('system.cpp')
+sources += files('traits.cpp')
+sources += files('world.cpp')
