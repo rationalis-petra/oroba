@@ -3,10 +3,10 @@
 #include <vector>
 
 #include "oroba/data/error.hpp"
-#include "oroba/object/primitives.hpp"
-#include "oroba/object/composite.hpp"
+#include "oroba/objects/numeric.hpp"
+#include "oroba/objects/composite.hpp"
 
-#include "oroba/world/traits.hpp"
+#include "oroba/kernel/traits.hpp"
 
 using namespace std;
 

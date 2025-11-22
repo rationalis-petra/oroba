@@ -1,0 +1,1 @@
+sources += files(['ostream.cpp'])

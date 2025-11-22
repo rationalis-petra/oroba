@@ -1,2 +1,0 @@
-
-sources += files(['widgets.cpp'])

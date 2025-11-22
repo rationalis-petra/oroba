@@ -1,12 +1,14 @@
 
 project('oroba', 'cpp')
 
-gtkdep = dependency('gtkmm-4.0')
+sfmldep = dependency('sfml-all')
+opengldep = dependency('opengl')
+
 incdir = include_directories('include')
 
 sources = []
 subdir('src')   # library is built here
 
 executable('oroba', sources: sources,
-                    dependencies: gtkdep,
+                    dependencies : [sfmldep, opengldep],
                     include_directories : incdir)

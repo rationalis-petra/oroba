@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-#include "oroba/object/object.hpp"
+#include "oroba/objects/object.hpp"
 
 using namespace std;
 

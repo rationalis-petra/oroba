@@ -7,8 +7,9 @@
 
 #include "oroba/parse/parse.hpp"
 #include "oroba/eval.hpp"
-#include "oroba/object/collections.hpp"
-#include "oroba/world/world.hpp"
+#include "oroba/objects/collections.hpp"
+#include "oroba/objects/init.hpp"
+#include "oroba/kernel/kernel.hpp"
 
 #include "command_line_args.hpp"
 
@@ -67,9 +68,10 @@ bool file_iter(istream& in, ostream& out, OrobaObject* active, LocalCollector& c
 int main (int argc, char** argv) {
 
     LocalCollector main_collector;
-    WorldObject* world = new WorldObject(main_collector);
-    main_collector.AddRoot(world);
-    main_collector.Add(world);
+    KernelNs* kernel = new KernelNs(main_collector);
+    main_collector.AddRoot(kernel);
+    main_collector.Add(kernel);
+    init_primitives();
 
     CommandLineArgs args = parse_args(argc, argv);
 
@@ -77,7 +79,7 @@ int main (int argc, char** argv) {
         cout << "Oroba\n";
         cout << "  version: " << version << "\n";
         try {
-            while (repl_iter(cin, cout, world->slots["lobby"].object, main_collector));
+            while (repl_iter(cin, cout, kernel, main_collector));
         } catch (InternalError& err) {
             cout << "Threw error indication exceptional circumstance:\n" << err.message << "\n";
             cout.flush();
@@ -86,7 +88,7 @@ int main (int argc, char** argv) {
         RunCommand cmd = get<RunCommand>(args);
         try {
             std::ifstream is(cmd.filename);
-            while (file_iter(is, cout, world->slots["lobby"].object, main_collector));
+            while (file_iter(is, cout, kernel, main_collector));
         } catch (InternalError& err) {
             cout << "Threw error indication exceptional circumstance:\n" << err.message << "\n";
             cout.flush();
@@ -95,5 +97,7 @@ int main (int argc, char** argv) {
         CLIError err = get<CLIError>(args);
         cout << "command line arg parsing failed with message:\n  " << err.message;
     }
+
+    teardown_primitives();
     return 0;
 }

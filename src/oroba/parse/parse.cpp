@@ -3,9 +3,9 @@
 #include <sstream>
 #include <optional>
 
-#include "oroba/object/composite.hpp"
-#include "oroba/object/collections.hpp"
-#include "oroba/object/primitives.hpp"
+#include "oroba/objects/composite.hpp"
+#include "oroba/objects/collections.hpp"
+#include "oroba/objects/numeric.hpp"
 
 #include "oroba/parse/tokstream.hpp"
 
@@ -58,7 +58,12 @@ optional<ParseError> parse_statement(TokStream& in, std::optional<TokenType> ter
             return error(get<string>(tok.val));
         case TokenType::EndOfStream:
             in.get();
-            return error("error - end of file!");
+            if (terminator.has_value()) {
+                return error("error - end of file!");
+            } else {
+                // TODO: gracefully return nothing.
+                return error("error - end of file!");
+            }
         case TokenType::Separator:
         case TokenType::Collector:
             in.get();

@@ -1,6 +1,6 @@
 subdir('data')
-subdir('object')
+subdir('objects')
 subdir('parse')
-subdir('world')
+subdir('kernel')
 
 sources += files('eval.cpp')
